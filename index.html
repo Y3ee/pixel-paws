@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Lounge - Cozy Productivity Corner</title>
+  <meta name="description" content="Welcome to Study Lounge! Your cozy corner for productivity. Track daily goals, level up your ScholarPaws pet, and study in a pixel-perfect cozy environment.">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+  <div class="container">
+    
+    <!-- HEADER & NAVIGATION -->
+    <header>
+      <nav class="nav-bar" id="navbar">
+        <div class="nav-brand">
+          <!-- Bunny/Rabbit Logo SVG -->
+          <svg class="nav-brand-logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.5 2C6.67 2 6 2.67 6 3.5V10.5C6 11.33 6.67 12 7.5 12H8V15H16V12H16.5C17.33 12 18 11.33 18 10.5V3.5C18 2.67 17.33 2 16.5 2C15.67 2 15 2.67 15 3.5V8H9V3.5C9 2.67 8.33 2 7.5 2Z" fill="#4E3629"/>
+            <path d="M9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12" stroke="#4E3629" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="10" cy="10" r="1" fill="#4E3629"/>
+            <circle cx="14" cy="10" r="1" fill="#4E3629"/>
+            <path d="M11 11.5H13" stroke="#4E3629" stroke-linecap="round"/>
+          </svg>
+          <span>Study Lounge</span>
+        </div>
+        
+        <ul class="nav-links">
+          <li><span class="nav-link active" data-tab="learn">Learn</span></li>
+          <li><span class="nav-link" data-tab="practice">Practice</span></li>
+          <li><span class="nav-link" data-tab="build">Build</span></li>
+          <li><span class="nav-link" data-tab="community">Community</span></li>
+        </ul>
+        
+        <div class="nav-controls">
+          <!-- Theme Toggle Icon -->
+          <button class="nav-icon-btn" id="theme-toggle" title="Toggle Theme" aria-label="Toggle Theme">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+          
+          <!-- Trophy Icon -->
+          <button class="nav-icon-btn" title="Achievements" aria-label="Achievements">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+              <path d="M4 22h16"/>
+              <path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"/>
+              <path d="M12 2a5 5 0 0 1 5 5v5a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/>
+            </svg>
+          </button>
+          
+          <!-- User Profile Icon -->
+          <button class="nav-icon-btn" title="Profile" aria-label="Profile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </button>
+          
+          <!-- Join Club Button -->
+          <button class="retro-btn btn-green-light" id="join-club-btn">Join Club</button>
+        </div>
+      </nav>
+    </header>
+    
+    <!-- MAIN GRID CONTAINER -->
+    <main class="main-content">
+      
+      <!-- LEFT COLUMN -->
+      <div class="left-panel">
+        
+        <!-- MASCOT SPEECH BUBBLE -->
+        <section class="mascot-speech-container" aria-label="Mascot Greeting">
+          <div class="mascot-avatar-box">
+            <img src="assets/book_mascot.png" alt="ScholarPaws Mascot" id="speech-mascot-img">
+          </div>
+          <div class="speech-bubble">
+            <p class="speech-bubble-text" id="speech-bubble-text">It's a brand new day! Ready to level up your focus?</p>
+          </div>
+        </section>
+        
+        <!-- HERO CARD -->
+        <section class="hero-card" aria-label="Welcome">
+          <!-- Decorative Watermark SVGs -->
+          <svg class="watermark-leaf leaf-top-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 2C12 2 14 6 17 8C20 10 22 12 22 12C22 12 18 12 15 15C12 18 12 22 12 22C12 22 10 18 7 15C4 12 2 12 2 12C2 12 4 10 7 8C10 6 12 2 12 2Z" />
+            <path d="M12 2V22" stroke-dasharray="2 2" />
+          </svg>
+          <svg class="watermark-leaf leaf-bottom-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 2C12 2 14 6 17 8C20 10 22 12 22 12C22 12 18 12 15 15C12 18 12 22 12 22C12 22 10 18 7 15C4 12 2 12 2 12C2 12 4 10 7 8C10 6 12 2 12 2Z" />
+            <path d="M12 2V22" stroke-dasharray="2 2" />
+          </svg>
+          
+          <div class="hero-image-frame">
+            <img src="assets/fireplace_scene.png" alt="Cozy Fireplace Scene">
+          </div>
+          
+          <h1 class="hero-title">Welcome to Study Lounge!</h1>
+          <p class="hero-subtitle">Your cozy corner for productivity awaits—but first, let's pick a task to conquer together.</p>
+          
+          <button class="retro-btn btn-green" id="get-started-btn">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="display:inline-block; vertical-align:middle; margin-right:4px;">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            Get Started
+          </button>
+        </section>
+        
+        <!-- DAILY GOALS SECTION -->
+        <section aria-labelledby="daily-goals-title">
+          <div class="section-header">
+            <h2 class="section-title" id="daily-goals-title">Daily Goals</h2>
+            <span class="section-link" id="explore-park-link">Explore the Park &darr;</span>
+          </div>
+          
+          <div class="goals-grid">
+            <!-- Goal 1: Morning Brew -->
+            <article class="goal-card" id="goal-morning-brew">
+              <div class="goal-header">
+                <span class="goal-tag tag-focus">Focus</span>
+                <span class="goal-icon" title="Morning Brew Icon">
+                  <!-- Coffee cup SVG -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                    <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                    <line x1="6" y1="2" x2="6" y2="4"/>
+                    <line x1="10" y1="2" x2="10" y2="4"/>
+                    <line x1="14" y1="2" x2="14" y2="4"/>
+                  </svg>
+                </span>
+              </div>
+              <h3 class="goal-title">Morning Brew</h3>
+              <p class="goal-desc">Complete one 25 minute Pomodoro session.</p>
+              <div class="goal-footer">
+                <div class="retro-progress-bar">
+                  <div class="retro-progress-fill" style="width: 25%;"></div>
+                </div>
+                <div class="goal-progress-container">
+                  <span>25%</span>
+                  <span class="goal-reward">Reward: 10 Coins</span>
+                </div>
+              </div>
+            </article>
+            
+            <!-- Goal 2: Read Notes -->
+            <article class="goal-card" id="goal-read-notes">
+              <div class="goal-header">
+                <span class="goal-tag tag-learn">Learn</span>
+                <span class="goal-icon" title="Read Notes Icon">
+                  <!-- Book SVG -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                  </svg>
+                </span>
+              </div>
+              <h3 class="goal-title">Read Notes</h3>
+              <p class="goal-desc">Review your study study notes for 15 minutes.</p>
+              <div class="goal-footer" id="read-notes-footer">
+                <div class="retro-progress-bar">
+                  <div class="retro-progress-fill" style="width: 100%;"></div>
+                </div>
+                <div class="goal-progress-container">
+                  <span>100%</span>
+                  <button class="retro-btn claim-btn" id="claim-goal-btn">Claim 15 Coins</button>
+                </div>
+              </div>
+            </article>
+            
+            <!-- Goal 3: Walk in Park -->
+            <article class="goal-card" id="goal-walk-park">
+              <div class="goal-header">
+                <span class="goal-tag tag-petcare">Pet Care</span>
+                <span class="goal-icon" title="Walk in Park Icon">
+                  <!-- Paw SVG -->
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                    <path d="M12 14c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z"/>
+                    <path d="M12 18c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                    <circle cx="6" cy="7" r="2"/>
+                    <circle cx="10" cy="4" r="2"/>
+                    <circle cx="14" cy="4" r="2"/>
+                    <circle cx="18" cy="7" r="2"/>
+                  </svg>
+                </span>
+              </div>
+              <h3 class="goal-title">Walk in Park</h3>
+              <p class="goal-desc">Reach 500 study points to unlock a park walk.</p>
+              <div class="goal-footer">
+                <div class="retro-progress-bar locked"></div>
+                <div class="goal-progress-container">
+                  <span>Locked</span>
+                  <span class="goal-reward">Reward: Rare Item</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+        
+        <!-- EXPLORE MORE SECTION -->
+        <section aria-labelledby="explore-title">
+          <div class="section-header">
+            <h2 class="section-title" id="explore-title">Explore more</h2>
+          </div>
+          
+          <div class="explore-grid">
+            <!-- Study Guides -->
+            <div class="explore-card">
+              <div class="explore-icon-box">
+                <!-- Book SVG -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                </svg>
+              </div>
+              <div class="explore-info">
+                <h3 class="explore-title">Study Guides</h3>
+                <p class="explore-desc">Review your notes and prepare for the next level.</p>
+              </div>
+            </div>
+            
+            <!-- Guild Hall -->
+            <div class="explore-card">
+              <div class="explore-icon-box">
+                <!-- Guild Users SVG -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+              <div class="explore-info">
+                <h3 class="explore-title">Guild Hall</h3>
+                <p class="explore-desc">Join fellow students in co-working sessions.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+      </div>
+      
+      <!-- RIGHT COLUMN (SIDEBAR) -->
+      <aside class="sidebar">
+        
+        <!-- SCHOLARPAWS PROFILE CARD -->
+        <section class="profile-card" aria-label="Pet Profile">
+          <div class="profile-header">
+            <div class="profile-avatar">
+              <img src="assets/book_mascot.png" alt="ScholarPaws Avatar" id="profile-mascot-img">
+            </div>
+            <div class="profile-title-box">
+              <h3 class="profile-name">ScholarPaws</h3>
+              <span class="profile-level" id="profile-pet-level">Pet Level 1</span>
+              <span class="profile-edit" id="edit-profile-btn">Edit</span>
+            </div>
+          </div>
+          
+          <div class="profile-stats-grid">
+            <!-- XP Stat -->
+            <div class="stat-item">
+              <div class="stat-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" width="18" height="18">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+              </div>
+              <div class="stat-text">
+                <span class="stat-value" id="stat-xp">120</span>
+                <span class="stat-label">Total XP</span>
+              </div>
+            </div>
+            
+            <!-- Rank Stat -->
+            <div class="stat-item">
+              <div class="stat-icon-wrapper" style="color: #CD7F32;">
+                <!-- Shield/Rank SVG -->
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" width="18" height="18">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+              </div>
+              <div class="stat-text">
+                <span class="stat-value" id="stat-rank">Bronze</span>
+                <span class="stat-label">Rank</span>
+              </div>
+            </div>
+            
+            <!-- Badges Stat -->
+            <div class="stat-item">
+              <div class="stat-icon-wrapper" style="color: #6C757D;">
+                <!-- Badge SVG -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                  <circle cx="12" cy="8" r="7"/>
+                  <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+                </svg>
+              </div>
+              <div class="stat-text">
+                <span class="stat-value" id="stat-badges">3</span>
+                <span class="stat-label">Badges</span>
+              </div>
+            </div>
+            
+            <!-- Streak Stat -->
+            <div class="stat-item">
+              <div class="stat-icon-wrapper" style="color: #DC3545;">
+                <!-- Flame SVG -->
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="none" width="18" height="18">
+                  <path d="M12 2c0 0-2 4-2 7 0 2 1.5 3 3.5 3.5-2 1.5-3 3.5-3 5.5 0 2.5 2 4 4.5 4s4.5-1.5 4.5-4c0-2-1-3-2-4.5V10c2-1 3.5-3 3.5-5 0 0-2 1.5-4 1.5 0 0-1-4-5-5z"/>
+                </svg>
+              </div>
+              <div class="stat-text">
+                <span class="stat-value" id="stat-streak">2</span>
+                <span class="stat-label">Day streak</span>
+              </div>
+            </div>
+          </div>
+          
+          <button class="retro-btn profile-btn" id="view-profile-btn">View profile</button>
+        </section>
+        
+        <!-- DAILY FOCUS QUEST CARD -->
+        <section class="daily-focus-card" aria-label="Daily Focus">
+          <div class="daily-focus-header">
+            <span class="daily-focus-title">#DailyFocus</span>
+            <span class="daily-focus-stats">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              <span id="focus-points-text">30 / 30</span>
+            </span>
+          </div>
+          
+          <div class="daily-focus-body">
+            <div class="daily-focus-progress-wrapper">
+              <div class="retro-progress-bar">
+                <div class="retro-progress-fill" id="focus-progress-fill" style="width: 100%;"></div>
+              </div>
+            </div>
+            
+            <div class="quest-status-box">
+              <div class="envelope-icon" id="quest-envelope">
+                <span class="envelope-star">⭐</span>
+                <!-- Envelope SVG -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </div>
+              <span class="quest-complete-text">Quest Complete!</span>
+            </div>
+          </div>
+          
+          <div class="daily-focus-footer" id="daily-focus-footer">
+            <button class="retro-btn claim-reward-btn" id="claim-focus-reward-btn">Claim Reward</button>
+          </div>
+        </section>
+        
+      </aside>
+      
+    </main>
+  </div>
+
+  <!-- Javascript Modules -->
+  <script src="scripts/state.js"></script>
+  <script src="scripts/theme.js"></script>
+  <script src="scripts/goals.js"></script>
+  <script src="scripts/app.js"></script>
+</body>
+</html>

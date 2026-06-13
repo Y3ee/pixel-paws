@@ -1,0 +1,69 @@
+/* variables.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Color Palette */
+  --bg-primary: #FFF9F2;
+  --bg-card: #FFFFFF;
+  --color-brown: #4E3629;
+  --color-brown-light: #8E7568;
+  --bg-peach: #FCD5C8;
+  --bg-peach-light: #FFEFEA;
+  --bg-green: #92A682;
+  --bg-green-light: #B5C4AD;
+  --bg-green-soft: #D7E0D3;
+  --color-yellow: #E9B872;
+  --color-orange: #E28D75;
+  --color-gray-locked: #EBE5DD;
+
+  /* Font Families */
+  --font-header: 'Fredoka', 'Outfit', sans-serif;
+  --font-body: 'Fredoka', 'Outfit', sans-serif;
+  --font-cozy-serif: 'Lora', Georgia, serif;
+
+  /* Borders & Shadows */
+  --border-width-thin: 2px;
+  --border-width-thick: 3px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-color: var(--color-brown);
+  
+  --border-retro-thin: var(--border-width-thin) solid var(--color-brown);
+  --border-retro-thick: var(--border-width-thick) solid var(--color-brown);
+  
+  --shadow-solid-sm: 2px 2px 0px var(--color-brown);
+  --shadow-solid-md: 4px 4px 0px var(--color-brown);
+  --shadow-solid-lg: 6px 6px 0px var(--color-brown);
+  
+  /* Layout Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Transition durations */
+  --transition-speed: 0.15s;
+}
+
+/* Base resets & styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--color-brown);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
