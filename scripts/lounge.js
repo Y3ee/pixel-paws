@@ -414,6 +414,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (statusSelect) {
         statusSelect.value = 'rest';
       }
+      // Reset the rest timer to 0 when sitting in the park
+      pauseStudyTimer();
+      studySeconds = 0;
+      if (timerDisplayClock) timerDisplayClock.textContent = "00:00:00";
       startStudyTimer();
       showSpeechBubble('char-speech', "Ah, sitting on the park bench. Time to relax! 🌳");
     } else {
