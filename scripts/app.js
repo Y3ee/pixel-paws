@@ -773,7 +773,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (mypetPetSprite) {
     mypetPetSprite.addEventListener('click', () => {
       triggerMypetHearts();
-      const happyLines = ['*purr* ❤️', '*pant pant* 🐾', 'Hehe, tickles! 😄', 'I love you! ❤️', 'Bark! 🐶', 'Meow! 🐱'];
+      const happyLines = ['*purr* ❤️', '*pant pant* 🐾', 'Hehe, tickles! 😄', 'I love you! ❤️', 'Do you miss me?', 'I  miss you!❤️'];
       showSpeech(happyLines[Math.floor(Math.random() * happyLines.length)]);
     });
   }
