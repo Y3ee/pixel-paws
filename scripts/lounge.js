@@ -278,35 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return true;
     }
 
-    // 2. Bookshelf 1
-    if (px >= 180 && px <= 230 && py >= 120 && py <= 185) return true;
-    // 3. Bookshelf 2
-    if (px >= 560 && px <= 610 && py >= 120 && py <= 185) return true;
-    // 4. Fireplace
-    if (px >= 635 && px <= 695 && py >= 120 && py <= 185) return true;
-
-    // 5. U-shaped Counter (entire area including inside)
-    if (px >= 285 && px <= 525 && py >= 120 && py <= 325) return true;
-
-    // 6. Booth 1 (Top Left Table)
-    if (px >= 60 && px <= 95 && py >= 180 && py <= 230) return true;
-    // 7. Booth 2 (Bottom Left Table)
-    if (px >= 60 && px <= 95 && py >= 370 && py <= 420) return true;
-
-    // 8. Round Table 1 (Top Right)
-    if (px >= 660 && px <= 720 && py >= 205 && py <= 260) return true;
-    // 9. Round Table 2 (Middle Right)
-    if (px >= 580 && px <= 640 && py >= 315 && py <= 370) return true;
-    // 10. Round Table 3 (Bottom Right)
-    if (px >= 660 && px <= 720 && py >= 415 && py <= 470) return true;
-
-    // 11. Plants
-    if (px >= 130 && px <= 160 && py >= 120 && py <= 175) return true;
-    if (px >= 10 && px <= 80 && py >= 410 && py <= 450) return true;
-    if (px >= 720 && px <= 760 && py >= 315 && py <= 365) return true;
-    if (px >= 720 && px <= 760 && py >= 415 && py <= 465) return true;
-    if (px >= 710 && px <= 740 && py >= 120 && py <= 175) return true;
-
+    // Interior collisions removed so the character can walk freely
     return false;
   }
 
