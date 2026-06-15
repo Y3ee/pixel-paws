@@ -1180,6 +1180,8 @@ body.dark-mode .profile-stats-grid {
   visibility: hidden;
   transition: opacity 0.2s ease, visibility 0.2s ease;
   font-family: var(--font-body);
+  overflow-y: auto;
+  padding: var(--spacing-lg) 0;
 }
 
 .modal-backdrop.active {
@@ -1197,6 +1199,7 @@ body.dark-mode .profile-stats-grid {
   padding: var(--spacing-lg);
   position: relative;
   animation: modalBounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+  margin: auto;
 }
 
 @keyframes modalBounce {

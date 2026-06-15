@@ -18,10 +18,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileNameEl = document.querySelector('.profile-name');
     if (profileNameEl) profileNameEl.textContent = state.username;
     
-    // Auto-hide onboarding if already completed
+    // Auto-hide or show onboarding overlay based on state
     const onboardingOverlay = document.getElementById('onboarding-overlay');
-    if (state.onboardingComplete && onboardingOverlay) {
-      onboardingOverlay.style.display = 'none';
+    if (onboardingOverlay) {
+      if (state.onboardingComplete) {
+        onboardingOverlay.style.display = 'none';
+        onboardingOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      } else {
+        onboardingOverlay.style.display = 'flex';
+        onboardingOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
     }
   }
 
@@ -246,17 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- UI INTERACTION HANDLERS ---
 
-  // Edit profile button
-  if (editProfileBtn) {
-    editProfileBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const currentName = profileNameEl ? profileNameEl.textContent : 'ScholarPaws';
-      const newName = prompt('Enter a new name for your pet:', currentName);
-      if (newName !== null) {
-        state.editPetName(newName);
-      }
-    });
-  }
 
   // Get Started button (trig onboarding overlay)
   if (getStartedBtn) {
