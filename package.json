@@ -4,7 +4,7 @@
   "description": "Cozy Study Lounge home page with pixel aesthetics",
   "main": "index.html",
   "scripts": {
-    "dev": "vite --port 3000 --open",
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
