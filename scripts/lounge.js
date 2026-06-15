@@ -53,10 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Simulation State Variables
   let currentRoom = 'cafe'; // 'cafe' or 'park'
-  let charX = 200;
-  let charY = 350;
-  let charTargetX = 200;
-  let charTargetY = 350;
+  let charX = 396;
+  let charY = 320;
+  let charTargetX = 396;
+  let charTargetY = 320;
   let charSpeed = 4;
   let charIsWalking = false;
   let charIsSitting = false;
@@ -65,35 +65,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Keyboard movement state
   const keysPressed = {};
 
-  window.addEventListener('keydown', (e) => {
-    // Disable movement when typing in a task input or status select
-    if (document.activeElement && (
-      document.activeElement.tagName === 'INPUT' || 
-      document.activeElement.tagName === 'TEXTAREA' || 
-      document.activeElement.tagName === 'SELECT'
-    )) {
-      return;
-    }
+  
 
-    const key = e.key.toLowerCase();
-    if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
-      e.preventDefault(); // prevent arrow keys scrolling
-      keysPressed[key] = true;
-      if (charIsSitting) standUp();
-    }
-  });
-
-  window.addEventListener('keyup', (e) => {
-    const key = e.key.toLowerCase();
-    if (key in keysPressed) {
-      delete keysPressed[key];
-    }
-  });
-
-  let petX = 240;
-  let petY = 370;
-  let petTargetX = 240;
-  let petTargetY = 370;
+  let petX = 396;
+  let petY = 330;
+  let petTargetX = 396;
+  let petTargetY = 330;
   let petSpeed = 3.5;
   let petIsWalking = false;
   let petWanderTimer = null;
@@ -119,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
       charSvgRef.setAttribute('href', `#char-avatar-${state.selectedAvatarIndex}`);
     }
     
-    const petNameStr = petNamesList[state.selectedPetIndex] || "Companion";
+    const petNameStr = state.petName || petNamesList[state.selectedPetIndex] || "Companion";
     if (petNameLabel) petNameLabel.textContent = petNameStr;
     if (petSvgRef) {
       petSvgRef.setAttribute('href', petSymbols[state.selectedPetIndex] || "#pet-puppy");
@@ -267,239 +244,88 @@ document.addEventListener('DOMContentLoaded', () => {
     }, duration);
   }
 
-  // --- COLLISION PHYSICS SYSTEM ---
-  function isCollidingCafe(px, py) {
-    // 1. Screen boundaries
-    if (px < 15 || px > 745 || py < 120 || py > 435) {
-      // Rug check: if they are near the bottom center door (x: 330-450, y > 435), allow them to exit!
-      if (py > 435 && px >= 330 && px <= 450) {
-        return false;
-      }
-      return true;
-    }
-
-    // Interior collisions removed so the character can walk freely
-    return false;
-  }
-
-  function isCollidingPark(px, py) {
-    if (px < 15 || px > 745 || py < 120 || py > 435) {
-      if (px < 15 && py >= 160 && py <= 260) {
-        return false; // Entrance door to Cafe is open
-      }
-      return true;
-    }
-    return false;
-  }
-
-  // --- MOVEMENT ENGINE (requestAnimationFrame) ---
-  function updatePositions() {
-    // Check keyboard movement first
-    let moveX = 0;
-    let moveY = 0;
-    
-    if (keysPressed['w'] || keysPressed['arrowup']) moveY -= 1;
-    if (keysPressed['s'] || keysPressed['arrowdown']) moveY += 1;
-    if (keysPressed['a'] || keysPressed['arrowleft']) moveX -= 1;
-    if (keysPressed['d'] || keysPressed['arrowright']) moveX += 1;
-
-    let isKeyboardMoving = (moveX !== 0 || moveY !== 0);
-
-    // 1. Walk Character
-    let charDx = 0;
-    let charDy = 0;
-    let isMoving = false;
-
-    if (isKeyboardMoving) {
-      isMoving = true;
-      const length = Math.sqrt(moveX * moveX + moveY * moveY);
-      charDx = (moveX / length) * charSpeed;
-      charDy = (moveY / length) * charSpeed;
-    } else if (charX !== charTargetX || charY !== charTargetY) {
-      isMoving = true;
-      const dx = charTargetX - charX;
-      const dy = charTargetY - charY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance <= charSpeed) {
-        charDx = charTargetX - charX;
-        charDy = charTargetY - charY;
-      } else {
-        charDx = (dx / distance) * charSpeed;
-        charDy = (dy / distance) * charSpeed;
-      }
-    }
-
-    if (isMoving) {
-      charIsWalking = true;
-      charSprite.classList.add('sprite-walking');
-
-      // Collision check & sliding physics
-      let nextX = charX + charDx;
-      let nextY = charY + charDy;
-      let contactX = nextX + 22;
-      let contactY = nextY + 42;
-
-      let allowedDx = charDx;
-      let allowedDy = charDy;
-
-      const isColliding = currentRoom === 'cafe' ? isCollidingCafe : isCollidingPark;
-
-      if (isColliding(contactX, contactY)) {
-        // Try sliding horizontally
-        const slideXCollides = isColliding(nextX + 22, charY + 42);
-        // Try sliding vertically
-        const slideYCollides = isColliding(charX + 22, nextY + 42);
-
-        if (!slideXCollides) {
-          allowedDy = 0; // slide horizontally
-        } else if (!slideYCollides) {
-          allowedDx = 0; // slide vertically
-        } else {
-          // Blocked completely
-          allowedDx = 0;
-          allowedDy = 0;
-          
-          if (!isKeyboardMoving) {
-            // Stop click-movement since we're stuck
-            charTargetX = charX;
-            charTargetY = charY;
-          }
-        }
-      }
-
-      charX = Math.max(5, Math.min(765, charX + allowedDx));
-      charY = Math.max(100, Math.min(460, charY + allowedDy));
-
-      if (isKeyboardMoving) {
-        charTargetX = charX;
-        charTargetY = charY;
-      }
-
-      charSprite.style.left = `${charX}px`;
-      charSprite.style.top = `${charY}px`;
-      updateCharacterDirection(allowedDx, allowedDy);
-    } else {
-      if (charIsWalking) {
-        charIsWalking = false;
-        charSprite.classList.remove('sprite-walking');
-        
-        // Snapping check: did we walk to a seat?
-        checkSeatSnap();
-      }
-    }
-
-    // 2. Walk Pet (follows character or wanders)
-    let finalPetSpeed = petSpeed;
-    if (state.petIsDead) {
-      // Dead pets don't walk!
-      petTargetX = petX;
-      petTargetY = petY;
-    } else {
-      // Make pet follow the moving owner
-      if (charIsWalking && Math.random() < 0.04) {
-        petTargetX = charX + (Math.random() * 40 - 20);
-        petTargetY = charY + 15;
-      }
-
-      const dxPet = petTargetX - petX;
-      const dyPet = petTargetY - petY;
-      const distancePet = Math.sqrt(dxPet * dxPet + dyPet * dyPet);
-
-      if (distancePet > 2) {
-        petIsWalking = true;
-        petSprite.classList.add('sprite-walking');
-        
-        let pDx = 0;
-        let pDy = 0;
-        if (distancePet <= finalPetSpeed) {
-          pDx = petTargetX - petX;
-          pDy = petTargetY - petY;
-          petX = petTargetX;
-          petY = petTargetY;
-        } else {
-          pDx = (dxPet / distancePet) * finalPetSpeed;
-          pDy = (dyPet / distancePet) * finalPetSpeed;
-          petX += pDx;
-          petY += pDy;
-        }
-        petSprite.style.left = `${petX}px`;
-        petSprite.style.top = `${petY}px`;
-        updatePetDirection(pDx, pDy);
-      } else {
-        if (petIsWalking) {
-          petIsWalking = false;
-          petSprite.classList.remove('sprite-walking');
-        }
-      }
-    }
-
-    // 3. Collision / Map Transition door checks
-    checkDoorTransitions();
-
-    requestAnimationFrame(updatePositions);
-  }
-
-  // Trigger position update loop
-  requestAnimationFrame(updatePositions);
-
-  // Check if character arrived at a door zone to swap rooms
-  function checkDoorTransitions() {
-    if (currentRoom === 'cafe' && charY >= 450 && charX >= 330 && charX <= 450) {
-      // Transitions to Park
-      changeRoom('park');
-    } else if (currentRoom === 'park' && charX <= 45 && charY >= 160 && charY <= 260) {
-      // Transitions to Cafe
-      changeRoom('cafe');
-    }
-  }
-
+  
   // Swap Cafe <-> Park
   function changeRoom(roomName) {
     if (charIsSitting) standUp();
     
     currentRoom = roomName;
     if (roomName === 'park') {
-      tabCafe.classList.remove('active');
-      tabPark.classList.add('active');
-      cafeOnlyElements.style.display = 'none';
-      parkOnlyElements.style.display = 'block';
-      viewportMap.className = 'viewport-map map-park';
-
-      // Snap coordinates to entrance door in park (left edge)
-      charX = 60;
-      charY = 220;
-      charTargetX = 65;
-      charTargetY = 220;
+      const tabCafe = document.getElementById('tab-room-cafe');
+      const tabPark = document.getElementById('tab-room-park');
+      const cafeOnlyElements = document.querySelector('.cafe-only-elements');
+      const parkOnlyElements = document.querySelector('.park-only-elements');
       
-      petX = 85;
-      petY = 230;
-      petTargetX = 85;
-      petTargetY = 230;
+      if (tabCafe) tabCafe.classList.remove('active');
+      if (tabPark) tabPark.classList.add('active');
+      if (cafeOnlyElements) cafeOnlyElements.style.display = 'none';
+      if (parkOnlyElements) parkOnlyElements.style.display = 'block';
+
+      // Snap coordinates to entrance door at the bottom gate of the park
+      charX = 213;
+      charY = 900;
+      if (typeof player !== 'undefined' && player) {
+        player.setPosition(charX + 22, charY + 42);
+      }
+      
+      petX = 233;
+      petY = 910;
 
       showSpeechBubble('char-speech', "Wow, look at all this green grass! 🌳");
       setTimeout(() => {
         showSpeechBubble('pet-speech', "Woof woof! Let's play!");
       }, 1500);
+
+      // Phaser sync
+      if (typeof phaserScene !== 'undefined' && phaserScene) {
+        if (phaserScene.bgImage) phaserScene.bgImage.setTexture('park-bg');
+        phaserScene.physics.world.setBounds(0, 0, 1024, 1024);
+        phaserScene.cameras.main.setBounds(0, 0, 1024, 1024);
+        // Force camera to snap immediately to player's new position
+        phaserScene.cameras.main.scrollX = player.x - 400;
+        phaserScene.cameras.main.scrollY = player.y - 250;
+      }
+      if (typeof furnitureCollider !== 'undefined' && furnitureCollider) {
+        furnitureCollider.active = false; // Disable cafe collisions in the park
+      }
+      transitionCooldown = 60; // 1 second cooldown on transition
+
     } else {
-      tabPark.classList.remove('active');
-      tabCafe.classList.add('active');
-      parkOnlyElements.style.display = 'none';
-      cafeOnlyElements.style.display = 'block';
-      viewportMap.className = 'viewport-map map-cafe';
-
-      // Snap coordinates to entrance door in cafe (bottom middle)
-      charX = 390;
-      charY = 440;
-      charTargetX = 390;
-      charTargetY = 415;
+      const tabCafe = document.getElementById('tab-room-cafe');
+      const tabPark = document.getElementById('tab-room-park');
+      const cafeOnlyElements = document.querySelector('.cafe-only-elements');
+      const parkOnlyElements = document.querySelector('.park-only-elements');
       
-      petX = 390;
-      petY = 445;
-      petTargetX = 390;
-      petTargetY = 445;
+      if (tabPark) tabPark.classList.remove('active');
+      if (tabCafe) tabCafe.classList.add('active');
+      if (parkOnlyElements) parkOnlyElements.style.display = 'none';
+      if (cafeOnlyElements) cafeOnlyElements.style.display = 'block';
 
-      showSpeechBubble('char-speech', "Ah, back in the warm cafe counter! ☕");
+      // Snap coordinates to exit door in cafe (bottom middle)
+      charX = 396;
+      charY = 320;
+      if (typeof player !== 'undefined' && player) {
+        player.setPosition(charX + 22, charY + 42);
+      }
+      
+      petX = 396;
+      petY = 330;
+
+      showSpeechBubble('char-speech', "Ah, back in the warm cafe! ☕");
+
+      // Phaser sync
+      if (typeof phaserScene !== 'undefined' && phaserScene) {
+        if (phaserScene.bgImage) phaserScene.bgImage.setTexture('cafe-bg');
+        phaserScene.physics.world.setBounds(0, 0, 847, 455);
+        phaserScene.cameras.main.setBounds(0, 0, 847, 455);
+        // Force camera to snap immediately
+        phaserScene.cameras.main.scrollX = player.x - 400;
+        phaserScene.cameras.main.scrollY = player.y - 250;
+      }
+      if (typeof furnitureCollider !== 'undefined' && furnitureCollider) {
+        furnitureCollider.active = true; // Enable cafe collisions
+      }
+      transitionCooldown = 60; // 1 second cooldown on transition
     }
 
     charSprite.style.left = `${charX}px`;
@@ -537,6 +363,11 @@ document.addEventListener('DOMContentLoaded', () => {
     charSprite.style.left = `${charX}px`;
     charSprite.style.top = `${charY}px`;
 
+    // Snap the Phaser player so it doesn't fight the DOM
+    if (typeof player !== 'undefined' && player) {
+      player.setPosition(charX + 22, charY + 42);
+    }
+
     // Move pet to sit right next to owner's chair
     petTargetX = targetX + 30;
     petTargetY = targetY + 25;
@@ -567,7 +398,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (charSvgRef) {
       charSvgRef.setAttribute('href', `#char-avatar-${state.selectedAvatarIndex}`);
       const svgEl = charSprite.querySelector('svg');
-      if (svgEl) svgEl.style.transform = 'scaleX(1)';
+      if (svgEl) {
+        svgEl.style.transform = 'scaleX(1)';
+      }
     }
 
     // Reset tool status select dropdown
@@ -877,6 +710,10 @@ document.addEventListener('DOMContentLoaded', () => {
     updatePetStatsUI();
   });
 
+  state.on('nameChange', (data) => {
+    if (petNameLabel) petNameLabel.textContent = data.name;
+  });
+
   // achievements modal in lounge nav
   const achievementsNavBtn = document.getElementById('achievements-nav-btn');
   if (achievementsNavBtn) {
@@ -986,4 +823,176 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- INITIAL SYNC ON BOOT ---
   syncStateToUI();
 
+
+  // ==========================================
+  // PHASER 3 TILEMAP INTEGRATION
+  // ==========================================
+  const config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 500,
+    parent: 'viewport-map',
+    transparent: true,
+    physics: {
+      default: 'arcade',
+      arcade: {
+        gravity: { y: 0 },
+        debug: false
+      }
+    },
+    scene: {
+      preload: preload,
+      create: create,
+      update: update
+    }
+  };
+
+  let player;
+  let cursors;
+  let furnitureLayer;
+  let furnitureCollider;
+  let transitionCooldown = 0;
+
+  function preload() {
+    this.load.image('cafe-bg', 'assets/lounge_cafe_map.png');
+    this.load.image('park-bg', 'assets/lounge_park_map.png');
+    this.load.image('cafe-tiles', 'assets/cafe-tiles.png');
+    this.load.tilemapTiledJSON('cafe-map', 'assets/cafe-map.json');
+  }
+
+  let phaserScene = null;
+  function create() {
+    phaserScene = this;
+    // Hide the CSS background map
+    const viewportMap = document.getElementById('viewport-map');
+    if (viewportMap) viewportMap.style.backgroundImage = 'none';
+
+    // Render the beautiful cafe design as the background!
+    phaserScene.bgImage = this.add.image(0, 0, 'cafe-bg').setOrigin(0, 0);
+
+    const map = this.make.tilemap({ key: 'cafe-map' });
+    const tileset = map.addTilesetImage('CafeTileset', 'cafe-tiles');
+
+    const floorLayer = map.createLayer('FloorLayer', tileset, 0, 0);
+    furnitureLayer = map.createLayer('FurnitureLayer', tileset, 0, 0);
+
+    // Hide the placeholder tilemap blocks so they are invisible collision walls
+    floorLayer.setVisible(false);
+    furnitureLayer.setVisible(false);
+
+    furnitureLayer.setCollisionByProperty({ collides: true });
+
+    // Create an invisible player sprite to handle physics
+    const g = this.add.graphics();
+    g.fillStyle(0x000000, 0);
+    g.fillRect(0, 0, 32, 32);
+    g.generateTexture('player-box', 32, 32);
+    g.destroy();
+
+    player = this.physics.add.sprite(charX, charY, 'player-box');
+    player.setCollideWorldBounds(true);
+
+    furnitureCollider = this.physics.add.collider(player, furnitureLayer);
+
+    // Set initial bounds based on currentRoom
+    let w = currentRoom === 'park' ? 1024 : 847;
+    let h = currentRoom === 'park' ? 1024 : 455;
+    this.physics.world.setBounds(0, 0, w, h);
+    this.cameras.main.setBounds(0, 0, w, h);
+    this.cameras.main.startFollow(player);
+
+    cursors = this.input.keyboard.createCursorKeys();
+  }
+
+  function update() {
+    if (!player) return;
+
+    player.setVelocity(0);
+
+    // Disable movement if typing in an input
+    if (document.activeElement && (
+      document.activeElement.tagName === 'INPUT' || 
+      document.activeElement.tagName === 'TEXTAREA' || 
+      document.activeElement.tagName === 'SELECT'
+    )) {
+      return;
+    }
+
+    let isMoving = false;
+
+    if (cursors.left.isDown || this.input.keyboard.addKey('A').isDown) {
+      player.setVelocityX(-160);
+      isMoving = true;
+    } else if (cursors.right.isDown || this.input.keyboard.addKey('D').isDown) {
+      player.setVelocityX(160);
+      isMoving = true;
+    }
+
+    if (cursors.up.isDown || this.input.keyboard.addKey('W').isDown) {
+      player.setVelocityY(-160);
+      isMoving = true;
+    } else if (cursors.down.isDown || this.input.keyboard.addKey('S').isDown) {
+      player.setVelocityY(160);
+      isMoving = true;
+    }
+
+    // Sync DOM character sprite to Phaser physics body
+    charX = player.x - 22;
+    charY = player.y - 42;
+    charSprite.style.left = charX + 'px';
+    charSprite.style.top = charY + 'px';
+
+    // Sync pet loosely
+    if (Math.abs(petX - charX) > 40 || Math.abs(petY - charY) > 40) {
+        petX += (charX - petX) * 0.05;
+        petY += (charY - petY) * 0.05;
+        petSprite.style.left = petX + 'px';
+        petSprite.style.top = petY + 'px';
+    }
+
+    if (isMoving) {
+        updateCharacterDirection(player.body.velocity.x, player.body.velocity.y);
+        updatePetDirection(charX - petX, charY - petY);
+        if (charIsSitting) standUp();
+    } else {
+        if (!charIsSitting) {
+            checkSeatSnap();
+        }
+    }
+
+    // Scroll the DOM elements container in sync with the Phaser camera!
+    const scrollableContent = document.getElementById('viewport-scrollable-content');
+    if (scrollableContent && this.cameras && this.cameras.main) {
+      const camera = this.cameras.main;
+      scrollableContent.style.transform = `translate(${-camera.scrollX}px, ${-camera.scrollY}px)`;
+    }
+
+    // Tick down transition cooldown
+    if (transitionCooldown > 0) {
+      transitionCooldown--;
+    }
+
+    // Dynamic Room Transition Check based on physical position
+    if (transitionCooldown === 0) {
+      if (currentRoom === 'cafe') {
+        if (player.y > 425 && player.x >= 370 && player.x <= 460) {
+          changeRoom('park');
+        }
+      } else if (currentRoom === 'park') {
+        if (player.y > 960 && player.x >= 160 && player.x <= 310) {
+          changeRoom('cafe');
+        }
+      }
+    }
+  }
+
+  const game = new Phaser.Game(config);
+
+  // Sync when Firestore finishes loading
+  state.on('stateLoaded', () => {
+    syncStateToUI();
+    if (typeof player !== 'undefined' && player) {
+      player.setPosition(charX + 22, charY + 42);
+    }
+  });
 });

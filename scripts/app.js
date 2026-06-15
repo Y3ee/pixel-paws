@@ -6,10 +6,33 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Initial sync from state
   const coinsEl = document.getElementById('stat-coins');
-  if (coinsEl) coinsEl.textContent = state.coins;
-
   const badgesCountEl = document.getElementById('nav-badges-count');
-  if (badgesCountEl) badgesCountEl.textContent = state.badges;
+
+  function syncAll() {
+    if (coinsEl) coinsEl.textContent = state.coins;
+    if (badgesCountEl) badgesCountEl.textContent = state.badges;
+    const xpEl = document.getElementById('stat-xp');
+    if (xpEl) xpEl.textContent = state.xp;
+    const levelEl = document.getElementById('profile-pet-level');
+    if (levelEl) levelEl.textContent = `Level ${state.petLevel}`;
+    const profileNameEl = document.querySelector('.profile-name');
+    if (profileNameEl) profileNameEl.textContent = state.username;
+    
+    // Auto-hide onboarding if already completed
+    const onboardingOverlay = document.getElementById('onboarding-overlay');
+    if (state.onboardingComplete && onboardingOverlay) {
+      onboardingOverlay.style.display = 'none';
+    }
+  }
+
+  // Run initial sync
+  syncAll();
+
+  // Listen to Firestore loading updates
+  state.on('stateLoaded', () => {
+    syncAll();
+    typeSpeech(`Welcome back, ${state.username}! Sync complete! 🐾`);
+  });
 
   // DOM Elements
   const xpEl = document.getElementById('stat-xp');
@@ -55,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const profileEditForm = document.getElementById('profile-edit-form');
   const profileUsernameInput = document.getElementById('profile-username-input');
   const profileAgeInput = document.getElementById('profile-age-input');
+  const profilePetNameInput = document.getElementById('profile-petname-input');
   const modalAvatarGrid = document.getElementById('modal-avatar-options-grid');
   const modalPetGrid = document.getElementById('modal-pet-options-grid');
   const profileSaveBtn = document.getElementById('profile-save-btn');
@@ -447,6 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Load current state into form inputs
       if (profileUsernameInput) profileUsernameInput.value = state.username;
       if (profileAgeInput) profileAgeInput.value = state.age;
+      if (profilePetNameInput) profilePetNameInput.value = state.petName || '';
       
       // Load selection indexes
       modalAvatarIdx = state.selectedAvatarIndex;
@@ -524,8 +549,9 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const newName = profileUsernameInput.value.trim();
       const newAge = profileAgeInput.value;
+      const newPetName = profilePetNameInput ? profilePetNameInput.value.trim() : '';
       
-      state.updateProfileInfo(newName, newAge, modalAvatarIdx, modalPetIdx);
+      state.updateProfileInfo(newName, newAge, modalAvatarIdx, modalPetIdx, newPetName);
       profileModal.classList.remove('active');
     });
   }

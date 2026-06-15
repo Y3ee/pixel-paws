@@ -1,4 +1,5 @@
 /* state.js */
+import { db, auth, isFirebaseEnabled, signInAnonymously, onAuthStateChanged, doc, setDoc, getDoc } from './firebase.js';
 
 const AppState = {
   xp: 120,
@@ -11,6 +12,7 @@ const AppState = {
   maxFocusPoints: 30,
   selectedAvatarIndex: 0,
   selectedPetIndex: 0,
+  petName: 'Companion',
   onboardingComplete: false,
   username: 'ScholarPaws',
   age: 20,
@@ -51,60 +53,94 @@ const AppState = {
     }
   },
 
-  // LocalStorage Persistence
+  // LocalStorage & Firestore Persistence
   save() {
+    const data = {
+      xp: this.xp,
+      coins: this.coins,
+      streak: this.streak,
+      badges: this.badges,
+      rank: this.rank,
+      petLevel: this.petLevel,
+      focusPoints: this.focusPoints,
+      maxFocusPoints: this.maxFocusPoints,
+      selectedAvatarIndex: this.selectedAvatarIndex,
+      selectedPetIndex: this.selectedPetIndex,
+      petName: this.petName,
+      onboardingComplete: this.onboardingComplete,
+      username: this.username,
+      age: this.age,
+      petHunger: this.petHunger,
+      petHealth: this.petHealth,
+      petIsDead: this.petIsDead,
+      goals: this.goals
+    };
+
+    // Save to localStorage as a fallback/backup
     try {
-      const data = {
-        xp: this.xp,
-        coins: this.coins,
-        streak: this.streak,
-        badges: this.badges,
-        rank: this.rank,
-        petLevel: this.petLevel,
-        focusPoints: this.focusPoints,
-        maxFocusPoints: this.maxFocusPoints,
-        selectedAvatarIndex: this.selectedAvatarIndex,
-        selectedPetIndex: this.selectedPetIndex,
-        onboardingComplete: this.onboardingComplete,
-        username: this.username,
-        age: this.age,
-        petHunger: this.petHunger,
-        petHealth: this.petHealth,
-        petIsDead: this.petIsDead,
-        goals: this.goals
-      };
       localStorage.setItem('study_lounge_state', JSON.stringify(data));
     } catch (e) {
       console.error("Failed to save state to localStorage", e);
     }
+
+    // Save to Firestore if enabled and authenticated
+    if (isFirebaseEnabled && auth && auth.currentUser) {
+      const docRef = doc(db, "users", auth.currentUser.uid);
+      setDoc(docRef, data, { merge: true })
+        .then(() => console.log("State successfully synced with Firestore!"))
+        .catch(err => console.error("Firestore sync failed:", err));
+    }
   },
 
   load() {
+    // First try loading from LocalStorage for immediate UI response
     try {
       const serialized = localStorage.getItem('study_lounge_state');
       if (serialized) {
-        const data = JSON.parse(serialized);
-        if (data.xp !== undefined) this.xp = data.xp;
-        if (data.coins !== undefined) this.coins = data.coins;
-        if (data.streak !== undefined) this.streak = data.streak;
-        if (data.badges !== undefined) this.badges = data.badges;
-        if (data.rank !== undefined) this.rank = data.rank;
-        if (data.petLevel !== undefined) this.petLevel = data.petLevel;
-        if (data.focusPoints !== undefined) this.focusPoints = data.focusPoints;
-        if (data.maxFocusPoints !== undefined) this.maxFocusPoints = data.maxFocusPoints;
-        if (data.selectedAvatarIndex !== undefined) this.selectedAvatarIndex = data.selectedAvatarIndex;
-        if (data.selectedPetIndex !== undefined) this.selectedPetIndex = data.selectedPetIndex;
-        if (data.onboardingComplete !== undefined) this.onboardingComplete = data.onboardingComplete;
-        if (data.username !== undefined) this.username = data.username;
-        if (data.age !== undefined) this.age = data.age;
-        if (data.petHunger !== undefined) this.petHunger = data.petHunger;
-        if (data.petHealth !== undefined) this.petHealth = data.petHealth;
-        if (data.petIsDead !== undefined) this.petIsDead = data.petIsDead;
-        if (data.goals !== undefined) this.goals = data.goals;
+        this.applyStateData(JSON.parse(serialized));
       }
     } catch (e) {
       console.error("Failed to load state from localStorage", e);
     }
+  },
+
+  async loadFromFirestore(uid) {
+    try {
+      const docRef = doc(db, "users", uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        this.applyStateData(data);
+        console.log("Successfully loaded state from Firestore!");
+        this.trigger('stateLoaded');
+      } else {
+        console.log("No state found in Firestore. Creating initial save.");
+        this.save();
+      }
+    } catch (e) {
+      console.error("Failed to load state from Firestore", e);
+    }
+  },
+
+  applyStateData(data) {
+    if (data.xp !== undefined) this.xp = data.xp;
+    if (data.coins !== undefined) this.coins = data.coins;
+    if (data.streak !== undefined) this.streak = data.streak;
+    if (data.badges !== undefined) this.badges = data.badges;
+    if (data.rank !== undefined) this.rank = data.rank;
+    if (data.petLevel !== undefined) this.petLevel = data.petLevel;
+    if (data.focusPoints !== undefined) this.focusPoints = data.focusPoints;
+    if (data.maxFocusPoints !== undefined) this.maxFocusPoints = data.maxFocusPoints;
+    if (data.selectedAvatarIndex !== undefined) this.selectedAvatarIndex = data.selectedAvatarIndex;
+    if (data.selectedPetIndex !== undefined) this.selectedPetIndex = data.selectedPetIndex;
+    if (data.petName !== undefined) this.petName = data.petName;
+    if (data.onboardingComplete !== undefined) this.onboardingComplete = data.onboardingComplete;
+    if (data.username !== undefined) this.username = data.username;
+    if (data.age !== undefined) this.age = data.age;
+    if (data.petHunger !== undefined) this.petHunger = data.petHunger;
+    if (data.petHealth !== undefined) this.petHealth = data.petHealth;
+    if (data.petIsDead !== undefined) this.petIsDead = data.petIsDead;
+    if (data.goals !== undefined) this.goals = data.goals;
   },
 
   // State mutations
@@ -172,8 +208,9 @@ const AppState = {
 
   editPetName(newName) {
     if (newName && newName.trim()) {
-      this.trigger('nameChange', { name: newName.trim() });
-      this.trigger('speechChange', { text: `Hello, I am now called ${newName.trim()}! Woof!` });
+      this.petName = newName.trim();
+      this.trigger('nameChange', { name: this.petName });
+      this.trigger('speechChange', { text: `Hello, I am now called ${this.petName}! Woof!` });
       this.save();
     }
   },
@@ -202,22 +239,29 @@ const AppState = {
     this.save();
   },
 
-  updateProfileInfo(name, age, avatarIdx, petIdx) {
+  updateProfileInfo(name, age, avatarIdx, petIdx, petName) {
     if (name && name.trim()) this.username = name.trim();
     if (age) this.age = parseInt(age) || this.age;
     this.selectedAvatarIndex = avatarIdx;
-    this.selectedPetIndex = petIdx;
     
+    // If pet index changed, reset default name unless petName is customized
     const petNames = ["Puppy", "Kitty", "Bunny", "Frog", "Owl"];
-    const chosenPetName = petNames[petIdx] || "Pet";
+    if (this.selectedPetIndex !== petIdx) {
+      this.selectedPetIndex = petIdx;
+      this.petName = petName && petName.trim() ? petName.trim() : (petNames[petIdx] || "Pet");
+    } else if (petName && petName.trim()) {
+      this.petName = petName.trim();
+    }
 
     this.trigger('profileUpdated', {
       username: this.username,
       age: this.age,
       avatarIndex: this.selectedAvatarIndex,
       petIndex: this.selectedPetIndex,
-      petName: chosenPetName
+      petName: this.petName
     });
+
+    this.trigger('nameChange', { name: this.petName });
 
     this.trigger('speechChange', {
       text: `Got it! I've updated your profile details.`
@@ -304,3 +348,15 @@ AppState.load();
 
 // Expose state globally
 window.AppState = AppState;
+
+if (isFirebaseEnabled && auth) {
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      console.log("Authenticated anonymously as:", user.uid);
+      await AppState.loadFromFirestore(user.uid);
+    } else {
+      console.log("Signing in anonymously...");
+      signInAnonymously(auth).catch(err => console.error("Anon auth failed", err));
+    }
+  });
+}

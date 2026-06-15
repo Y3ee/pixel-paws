@@ -87,78 +87,81 @@
         <div class="lounge-viewport-container" id="lounge-viewport-container">
           <div class="viewport-map map-cafe" id="viewport-map">
             
-            <!-- Cafe Furniture & Boundary zones -->
-            <div class="cafe-only-elements">
-              <!-- Booth 1 (Top Left) -->
-              <div class="viewport-furniture table-interactive" id="cafe-table-1" data-table-id="1" style="top: 180px; left: 60px; width: 35px; height: 50px; background: transparent; border: none; box-shadow: none;">
-                <div class="table-slot" id="table-slot-1" style="top: 15px; left: calc(50% - 12px);"></div>
-              </div>
-              <div class="viewport-chair seat-interactive" data-table-id="1" style="top: 135px; left: 65px; width: 26px; height: 26px;">🪑</div>
-              <div class="viewport-chair seat-interactive" data-table-id="1" style="top: 225px; left: 65px; width: 26px; height: 26px;">🪑</div>
-              
-              <!-- Booth 2 (Bottom Left) -->
-              <div class="viewport-furniture table-interactive" id="cafe-table-2" data-table-id="2" style="top: 370px; left: 60px; width: 35px; height: 50px; background: transparent; border: none; box-shadow: none;">
-                <div class="table-slot" id="table-slot-2" style="top: 15px; left: calc(50% - 12px);"></div>
-              </div>
-              <div class="viewport-chair seat-interactive" data-table-id="2" style="top: 325px; left: 65px; width: 26px; height: 26px;">🪑</div>
-              <div class="viewport-chair seat-interactive" data-table-id="2" style="top: 415px; left: 65px; width: 26px; height: 26px;">🪑</div>
+            <div id="viewport-scrollable-content" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; will-change: transform;">
+              <!-- Cafe Furniture & Boundary zones -->
+              <div class="cafe-only-elements">
+                <!-- Booth 1 (Top Left) -->
+                <div class="viewport-furniture table-interactive" id="cafe-table-1" data-table-id="1" style="top: 180px; left: 60px; width: 35px; height: 50px; background: transparent; border: none; box-shadow: none;">
+                  <div class="table-slot" id="table-slot-1" style="top: 15px; left: calc(50% - 12px);"></div>
+                </div>
+                <div class="viewport-chair seat-interactive" data-table-id="1" style="top: 135px; left: 65px; width: 26px; height: 26px;">🪑</div>
+                <div class="viewport-chair seat-interactive" data-table-id="1" style="top: 225px; left: 65px; width: 26px; height: 26px;">🪑</div>
+                
+                <!-- Booth 2 (Bottom Left) -->
+                <div class="viewport-furniture table-interactive" id="cafe-table-2" data-table-id="2" style="top: 370px; left: 60px; width: 35px; height: 50px; background: transparent; border: none; box-shadow: none;">
+                  <div class="table-slot" id="table-slot-2" style="top: 15px; left: calc(50% - 12px);"></div>
+                </div>
+                <div class="viewport-chair seat-interactive" data-table-id="2" style="top: 325px; left: 65px; width: 26px; height: 26px;">🪑</div>
+                <div class="viewport-chair seat-interactive" data-table-id="2" style="top: 415px; left: 65px; width: 26px; height: 26px;">🪑</div>
 
-              <!-- Round Table 1 (Top Right) -->
-              <div class="viewport-furniture table-interactive" id="cafe-table-3" data-table-id="3" style="top: 215px; left: 670px; width: 45px; height: 45px; background: transparent; border: none; box-shadow: none;">
-                <div class="table-slot" id="table-slot-3" style="top: 12px; left: calc(50% - 12px);"></div>
-              </div>
-              <div class="viewport-chair seat-interactive" data-table-id="3" style="top: 220px; left: 640px; width: 26px; height: 26px;">🪑</div>
-              <div class="viewport-chair seat-interactive" data-table-id="3" style="top: 220px; left: 720px; width: 26px; height: 26px;">🪑</div>
+                <!-- Round Table 1 (Top Right) -->
+                <div class="viewport-furniture table-interactive" id="cafe-table-3" data-table-id="3" style="top: 215px; left: 670px; width: 45px; height: 45px; background: transparent; border: none; box-shadow: none;">
+                  <div class="table-slot" id="table-slot-3" style="top: 12px; left: calc(50% - 12px);"></div>
+                </div>
+                <div class="viewport-chair seat-interactive" data-table-id="3" style="top: 220px; left: 640px; width: 26px; height: 26px;">🪑</div>
+                <div class="viewport-chair seat-interactive" data-table-id="3" style="top: 220px; left: 720px; width: 26px; height: 26px;">🪑</div>
 
-              <!-- Round Table 2 (Middle Right) -->
-              <div class="viewport-furniture table-interactive" id="cafe-table-4" data-table-id="4" style="top: 325px; left: 590px; width: 45px; height: 45px; background: transparent; border: none; box-shadow: none;">
-                <div class="table-slot" id="table-slot-4" style="top: 12px; left: calc(50% - 12px);"></div>
-              </div>
-              <div class="viewport-chair seat-interactive" data-table-id="4" style="top: 330px; left: 560px; width: 26px; height: 26px;">🪑</div>
-              <div class="viewport-chair seat-interactive" data-table-id="4" style="top: 330px; left: 640px; width: 26px; height: 26px;">🪑</div>
+                <!-- Round Table 2 (Middle Right) -->
+                <div class="viewport-furniture table-interactive" id="cafe-table-4" data-table-id="4" style="top: 325px; left: 590px; width: 45px; height: 45px; background: transparent; border: none; box-shadow: none;">
+                  <div class="table-slot" id="table-slot-4" style="top: 12px; left: calc(50% - 12px);"></div>
+                </div>
+                <div class="viewport-chair seat-interactive" data-table-id="4" style="top: 330px; left: 560px; width: 26px; height: 26px;">🪑</div>
+                <div class="viewport-chair seat-interactive" data-table-id="4" style="top: 330px; left: 640px; width: 26px; height: 26px;">🪑</div>
 
-              <!-- Round Table 3 (Bottom Right) -->
-              <div class="viewport-furniture table-interactive" id="cafe-table-5" data-table-id="5" style="top: 425px; left: 670px; width: 45px; height: 45px; background: transparent; border: none; box-shadow: none;">
-                <div class="table-slot" id="table-slot-5" style="top: 12px; left: calc(50% - 12px);"></div>
-              </div>
-              <div class="viewport-chair seat-interactive" data-table-id="5" style="top: 430px; left: 640px; width: 26px; height: 26px;">🪑</div>
-              <div class="viewport-chair seat-interactive" data-table-id="5" style="top: 430px; left: 720px; width: 26px; height: 26px;">🪑</div>
+                <!-- Round Table 3 (Bottom Right) -->
+                <div class="viewport-furniture table-interactive" id="cafe-table-5" data-table-id="5" style="top: 425px; left: 670px; width: 45px; height: 45px; background: transparent; border: none; box-shadow: none;">
+                  <div class="table-slot" id="table-slot-5" style="top: 12px; left: calc(50% - 12px);"></div>
+                </div>
+                <div class="viewport-chair seat-interactive" data-table-id="5" style="top: 430px; left: 640px; width: 26px; height: 26px;">🪑</div>
+                <div class="viewport-chair seat-interactive" data-table-id="5" style="top: 430px; left: 720px; width: 26px; height: 26px;">🪑</div>
 
-              <!-- Exit Door to Park (Bottom Center) -->
-              <div class="viewport-exit-door" id="cafe-exit-door" style="top: 465px; left: 350px; width: 80px; height: 35px; background: rgba(78, 34, 15, 0.4); border: 2px dashed #4E220F; opacity: 0.85;">
-                <div class="door-frame" style="writing-mode: horizontal-tb; text-orientation: upright; font-size: 10px;">EXIT ➔</div>
+                <!-- Exit Door to Park (Bottom Center) -->
+                <div class="viewport-exit-door" id="cafe-exit-door" style="top: 415px; left: 390px; width: 60px; height: 35px; background: rgba(78, 34, 15, 0.4); border: 2px dashed #4E220F; opacity: 0.85;">
+                  <div class="door-frame" style="writing-mode: horizontal-tb; text-orientation: upright; font-size: 10px;">EXIT ➔</div>
+                </div>
               </div>
-            </div>
 
-            <!-- Park Furniture & Boundary zones -->
-            <div class="park-only-elements" style="display: none;">
-              <!-- Entry Door to Cafe -->
-              <div class="viewport-exit-door" id="park-entry-door" style="top: 180px; left: 0; width: 40px; height: 80px; background: rgba(78, 34, 15, 0.6); opacity: 0.85;">
-                <div class="door-frame">🚪 CAFE</div>
+              <!-- Park Furniture & Boundary zones -->
+              <!-- Park Furniture & Boundary zones -->
+              <div class="park-only-elements" style="display: none;">
+                <!-- Entry Door to Cafe at the bottom gate -->
+                <div class="viewport-exit-door" id="park-entry-door" style="top: 930px; left: 160px; width: 150px; height: 80px; background: rgba(78, 34, 15, 0.4); opacity: 0.85; border: 2px dashed #4E220F;">
+                  <div class="door-frame" style="writing-mode: horizontal-tb; font-size: 11px;">🚪 CAFE</div>
+                </div>
               </div>
-            </div>
 
-            <!-- ACTIVE SPRITES (ABSOLUTELY POSITIONED) -->
-            <!-- Character sprite -->
-            <div class="lounge-sprite character-sprite" id="lounge-character" style="top: 350px; left: 200px;">
-              <div class="sprite-wrapper">
-                <svg><use id="char-svg-ref" href="#char-avatar-0"></use></svg>
+              <!-- ACTIVE SPRITES (ABSOLUTELY POSITIONED) -->
+              <!-- Character sprite -->
+              <div class="lounge-sprite character-sprite" id="lounge-character" style="top: 350px; left: 200px;">
+                <div class="sprite-wrapper">
+                  <svg><use id="char-svg-ref" href="#char-avatar-0"></use></svg>
+                </div>
+                <div class="speech-bubble-lounge" id="char-speech">Hey! Use WASD / Arrow keys or click floor to walk. Click chairs to study!</div>
+                <div class="character-name-label" id="char-name-label">y3ee</div>
               </div>
-              <div class="speech-bubble-lounge" id="char-speech">Hey! Use WASD / Arrow keys or click floor to walk. Click chairs to study!</div>
-              <div class="character-name-label" id="char-name-label">y3ee</div>
-            </div>
 
-            <!-- Pet sprite -->
-            <div class="lounge-sprite pet-sprite" id="lounge-pet" style="top: 370px; left: 240px;">
-              <div class="sprite-wrapper">
-                <svg><use id="pet-svg-ref" href="#pet-puppy"></use></svg>
+              <!-- Pet sprite -->
+              <div class="lounge-sprite pet-sprite" id="lounge-pet" style="top: 370px; left: 240px;">
+                <div class="sprite-wrapper">
+                  <svg><use id="pet-svg-ref" href="#pet-puppy"></use></svg>
+                </div>
+                <div class="pet-heart-effect" id="pet-heart">❤️</div>
+                <div class="speech-bubble-lounge" id="pet-speech">Woof!</div>
+                <div class="pet-name-label" id="pet-name-label">Puppy</div>
               </div>
-              <div class="pet-heart-effect" id="pet-heart">❤️</div>
-              <div class="speech-bubble-lounge" id="pet-speech">Woof!</div>
-              <div class="pet-name-label" id="pet-name-label">Puppy</div>
-            </div>
 
-          </div>
+            </div> <!-- End viewport-scrollable-content -->
+          </div> <!-- End viewport-map -->
         </div>
       </div>
       
@@ -777,8 +780,9 @@
   </svg>
 
   <!-- Javascript Modules -->
-  <script src="scripts/state.js"></script>
-  <script src="scripts/theme.js"></script>
-  <script src="scripts/lounge.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+  <script type="module" src="scripts/state.js"></script>
+  <script type="module" src="scripts/theme.js"></script>
+  <script type="module" src="scripts/lounge.js"></script>
 </body>
 </html>
