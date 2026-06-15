@@ -1,0 +1,867 @@
+/* styles/lounge.css */
+
+/* Main Layout Grid for the Lounge Page */
+.lounge-main-layout {
+  display: grid;
+  grid-template-columns: 800px 1fr;
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .lounge-main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lounge-left-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+/* Room tabs styling */
+.room-selector-tabs {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.room-tab {
+  background-color: var(--bg-card);
+  color: var(--color-brown-light);
+  border: var(--border-retro-thin);
+  border-bottom: none;
+  border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-family: var(--font-header);
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 2px -2px 0px rgba(78, 34, 15, 0.1);
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.room-tab:hover {
+  background-color: var(--bg-green-soft);
+  color: var(--color-brown);
+}
+
+.room-tab.active {
+  background-color: var(--bg-green);
+  color: #FFFDF9;
+  border: var(--border-retro-thick);
+  border-bottom: none;
+  font-size: 15px;
+  box-shadow: none;
+}
+
+/* Viewport container and maps */
+.lounge-viewport-container {
+  width: 800px;
+  height: 500px;
+  border: var(--border-retro-thick);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-solid-lg);
+  overflow: hidden;
+  position: relative;
+  background-color: #EADFC5;
+}
+
+.viewport-map {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.5s ease;
+}
+
+/* Pixel Art Map Backgrounds (matching screenshot aesthetic) */
+.viewport-map.map-cafe {
+  background-image: url('../assets/lounge_cafe_map.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.viewport-map.map-park {
+  background-image: url('../assets/lounge_park_map.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Sprites styling and movements */
+.lounge-sprite {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  z-index: 100;
+  transform-origin: bottom center;
+  /* Smooth walking updates from JS coordinates interpolation */
+  transition: left 0.12s linear, top 0.12s linear;
+  pointer-events: none; /* Clicking passes to floor tiles underneath */
+}
+
+.sprite-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lounge-sprite svg {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  filter: drop-shadow(1px 2px 0px rgba(0,0,0,0.15));
+}
+
+/* Sprite walking animation */
+@keyframes wobble-walk {
+  0%, 100% { transform: translateY(0) rotate(0deg) scaleX(1); }
+  25% { transform: translateY(-4px) rotate(-4deg) scaleX(0.95); }
+  75% { transform: translateY(-4px) rotate(4deg) scaleX(0.95); }
+}
+
+.sprite-walking .sprite-wrapper {
+  animation: wobble-walk 0.3s infinite ease-in-out;
+}
+
+/* Sprite sitting layout */
+.sprite-sitting .sprite-wrapper {
+  transform: scaleY(0.8) translateY(2px);
+}
+
+.sprite-sitting {
+  z-index: 95; /* Behind the table */
+}
+
+/* Character and Pet name labels above sprites */
+.character-name-label, .pet-name-label {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  font-family: var(--font-header);
+  font-weight: bold;
+  background-color: rgba(78, 34, 15, 0.85);
+  color: #FFFDF9;
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid var(--color-brown);
+  white-space: nowrap;
+  box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+  z-index: 105;
+}
+
+/* Tamagotchi death fainted state */
+.sprite-fainted .sprite-wrapper {
+  transform: rotate(90deg) scaleY(0.7) translateY(4px);
+  opacity: 0.6;
+}
+
+.sprite-fainted .character-name-label, .sprite-fainted .pet-name-label {
+  background-color: #DC3545;
+  border-color: #721C24;
+}
+
+/* Floating speech bubbles on characters/pets */
+.speech-bubble-lounge {
+  position: absolute;
+  top: -65px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #FFFDF9;
+  color: var(--color-brown);
+  border: var(--border-retro-thin);
+  border-radius: var(--border-radius-sm);
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  width: 130px;
+  text-align: center;
+  box-shadow: var(--shadow-solid-sm);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 200;
+}
+
+.speech-bubble-lounge.active {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-3px);
+}
+
+.speech-bubble-lounge::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: calc(50% - 6px);
+  border-width: 6px 6px 0;
+  border-style: solid;
+  border-color: #FFFDF9 transparent transparent;
+  display: block;
+  width: 0;
+  z-index: 2;
+}
+
+.speech-bubble-lounge::before {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: calc(50% - 8px);
+  border-width: 8px 8px 0;
+  border-style: solid;
+  border-color: var(--color-brown) transparent transparent;
+  display: block;
+  width: 0;
+  z-index: 1;
+}
+
+/* Hearts effect when pet is happy */
+.pet-heart-effect {
+  position: absolute;
+  top: -30px;
+  left: 12px;
+  font-size: 14px;
+  animation: heart-float 1.5s ease-out forwards;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 110;
+}
+
+@keyframes heart-float {
+  0% { transform: translateY(10px) scale(0.5); opacity: 0; }
+  20% { transform: translateY(0) scale(1.2); opacity: 1; }
+  100% { transform: translateY(-30px) scale(1); opacity: 0; }
+}
+
+/* Furniture & Map obstacles */
+.viewport-furniture {
+  position: absolute;
+  background-color: var(--bg-card);
+  border: var(--border-retro-thick);
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-solid-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-header);
+  font-weight: bold;
+  font-size: 11px;
+  color: var(--color-brown-light);
+  user-select: none;
+  z-index: 50;
+}
+
+/* Interactive seats styled as glowing target hotspots overlaying pre-rendered background chairs */
+.viewport-chair {
+  position: absolute;
+  font-size: 12px;
+  color: transparent; /* hide the raw emoji */
+  background-color: rgba(232, 193, 127, 0.45); /* warm golden transparent circle */
+  border: 1.5px dashed var(--color-brown);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 40;
+  opacity: 0.75;
+  box-shadow: 0px 2px 4px rgba(0,0,0,0.15);
+  transition: transform var(--transition-speed), background-color var(--transition-speed), border-style var(--transition-speed), opacity var(--transition-speed);
+}
+
+.viewport-chair:hover {
+  background-color: rgba(176, 186, 153, 0.9); /* sage green highlight */
+  border-style: solid;
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+/* Cafe Counter details */
+.cafe-counter {
+  background-color: #9D6638;
+  border-color: var(--color-brown);
+  box-shadow: var(--shadow-solid-sm);
+  color: #FFFDF9;
+  z-index: 45;
+}
+
+/* Interactive tables details */
+.table-interactive {
+  background-color: #D4A373;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  z-index: 90;
+}
+
+.table-interactive:hover {
+  background-color: #E6B88A;
+}
+
+.table-surface {
+  font-size: 10px;
+  color: #4E220F;
+  opacity: 0.85;
+}
+
+/* Study Tool Slot overlay on table */
+.table-slot {
+  position: absolute;
+  top: -12px;
+  left: calc(50% - 14px);
+  width: 28px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  z-index: 100;
+  pointer-events: none;
+  animation: float-tool 2s infinite ease-in-out;
+}
+
+@keyframes float-tool {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* Exit/Entry doors to transition maps */
+.viewport-exit-door {
+  position: absolute;
+  background-color: var(--color-orange);
+  border: var(--border-retro-thick);
+  box-shadow: var(--shadow-solid-sm);
+  cursor: pointer;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-speed), transform var(--transition-speed);
+}
+
+.viewport-exit-door:hover {
+  background-color: var(--bg-green);
+  transform: scaleY(1.05);
+}
+
+.door-frame {
+  font-family: var(--font-header);
+  font-size: 10px;
+  font-weight: bold;
+  color: #FFFDF9;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+/* Park elements */
+.park-tree {
+  position: absolute;
+  font-size: 38px;
+  z-index: 70;
+  user-select: none;
+}
+
+.park-bench {
+  background-color: #C2B280;
+  z-index: 50;
+}
+
+.pet-sandbox {
+  background-color: #EADFC5;
+  border-style: dashed;
+  z-index: 45;
+}
+
+.sandbox-label {
+  font-size: 9px;
+  text-align: center;
+}
+
+/* SIDEBAR & HUD PANELS */
+.lounge-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.lounge-sidebar-card {
+  background-color: var(--bg-card);
+  border: var(--border-retro-thick);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-solid-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.sidebar-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px dashed #E6DCD2;
+  padding-bottom: var(--spacing-sm);
+}
+
+.sidebar-card-title {
+  font-family: var(--font-header);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-brown);
+}
+
+/* Badges states */
+.pet-state-badge {
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border: var(--border-retro-thin);
+  border-radius: var(--border-radius-sm);
+  text-transform: uppercase;
+}
+
+.badge-satisfied {
+  background-color: var(--bg-green-soft);
+  color: #42523A;
+}
+
+.badge-hungry {
+  background-color: #FFF3CD;
+  color: #856404;
+}
+
+.badge-fainted {
+  background-color: #F8D7DA;
+  color: #721C24;
+}
+
+/* Tamagotchi Meters */
+.pet-stats-meters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.meter-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.meter-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-brown-light);
+}
+
+/* Item shop layout */
+.pet-shop-drawer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.shop-title {
+  font-family: var(--font-header);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-brown-light);
+}
+
+.shop-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.shop-item-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background-color: var(--bg-peach-light);
+  border: var(--border-retro-thin);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  transition: transform var(--transition-speed);
+}
+
+.shop-item-card:hover {
+  transform: translateY(-1px);
+}
+
+.shop-item-icon {
+  font-size: 20px;
+}
+
+.shop-item-details {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.shop-item-name {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-brown);
+}
+
+.shop-item-effect {
+  font-size: 9px;
+  color: var(--color-brown-light);
+}
+
+.shop-buy-btn {
+  font-size: 10px;
+  padding: 3px 6px;
+  border-width: 2px;
+  box-shadow: 1px 1px 0px var(--color-brown);
+}
+
+.shop-buy-btn:hover {
+  transform: scale(1.05);
+}
+
+.shop-buy-btn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 0px 0px 0px var(--color-brown);
+}
+
+/* Discord Status select */
+.session-status-selector {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.session-label {
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--color-brown-light);
+}
+
+.session-dropdown {
+  background-color: var(--bg-primary);
+  border: var(--border-retro-thin);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm);
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-brown);
+  cursor: pointer;
+  outline: none;
+}
+
+.session-dropdown:disabled {
+  background-color: var(--color-gray-locked);
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* Clock Display */
+.pomodoro-timer-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.timer-display {
+  font-family: var(--font-header);
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  background-color: #FAF4EC;
+  border: var(--border-retro-thin);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-brown);
+  padding: var(--spacing-sm);
+  box-shadow: inset 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+.timer-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+}
+
+.timer-btn {
+  font-size: 11px;
+  padding: 4px;
+}
+
+.timer-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.timer-tooltip-note {
+  font-size: 9px;
+  color: #7C503D;
+  font-style: italic;
+  line-height: 1.3;
+}
+
+/* Tasks Box */
+.task-reward-info {
+  font-size: 10px;
+  color: var(--bg-green);
+  font-weight: bold;
+}
+
+.task-add-form {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.task-input {
+  flex-grow: 1;
+  background-color: var(--bg-primary);
+  border: var(--border-retro-thin);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm);
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-brown);
+  outline: none;
+}
+
+.task-add-btn {
+  font-size: 14px;
+  padding: 4px 10px;
+  border-width: 2px;
+}
+
+.task-list-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.task-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background-color: var(--bg-peach-light);
+  border: var(--border-retro-thin);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 12px;
+  color: var(--color-brown);
+}
+
+.task-checkbox {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--bg-green);
+  cursor: pointer;
+}
+
+.task-text-label {
+  flex-grow: 1;
+}
+
+.task-list-item.task-completed .task-text-label {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.task-delete-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #EF4444;
+  cursor: pointer;
+}
+
+/* Dark Mode Overrides for Lounge elements */
+body.dark-mode .room-tab {
+  background-color: #3D2B20;
+  border-color: #FFFDF9;
+  color: var(--color-brown-light);
+}
+
+body.dark-mode .room-tab.active {
+  background-color: var(--bg-green);
+  color: #FFFDF9;
+  border-color: #FFFDF9;
+}
+
+body.dark-mode .lounge-viewport-container {
+  border-color: #FFFDF9;
+}
+
+body.dark-mode .viewport-map.map-cafe {
+  background: repeating-linear-gradient(90deg, #3D2B20, #3D2B20 40px, #2C1E16 40px, #2C1E16 41px);
+  background-color: #3D2B20;
+}
+
+body.dark-mode .viewport-map.map-park {
+  background: repeating-linear-gradient(45deg, #42523A, #42523A 30px, #364430 30px, #364430 32px);
+  background-color: #42523A;
+}
+
+body.dark-mode .lounge-sprite .character-name-label,
+body.dark-mode .lounge-sprite .pet-name-label {
+  background-color: rgba(255, 255, 255, 0.85);
+  color: #2C1E16;
+  border-color: #FFFDF9;
+}
+
+body.dark-mode .speech-bubble-lounge {
+  background-color: #3D2B20;
+  color: #FFFDF9;
+  border-color: #FFFDF9;
+}
+
+body.dark-mode .speech-bubble-lounge::after {
+  border-color: #3D2B20 transparent transparent;
+}
+
+body.dark-mode .speech-bubble-lounge::before {
+  border-color: #FFFDF9 transparent transparent;
+}
+
+body.dark-mode .table-interactive {
+  background-color: #8C6D58;
+  border-color: #FFFDF9;
+}
+
+body.dark-mode .table-interactive:hover {
+  background-color: #9D7D68;
+}
+
+body.dark-mode .table-surface {
+  color: #FFFDF9;
+}
+
+body.dark-mode .counter-label,
+body.dark-mode .sandbox-label {
+  color: #FFFDF9;
+}
+
+body.dark-mode .cafe-counter {
+  background-color: #5E3E28;
+  border-color: #FFFDF9;
+}
+
+body.dark-mode .viewport-exit-door {
+  border-color: #FFFDF9;
+}
+
+body.dark-mode .timer-display {
+  background-color: #2C1E16;
+  color: #FFFDF9;
+}
+
+body.dark-mode .shop-item-card,
+body.dark-mode .task-list-item {
+  background-color: #4C372A;
+  border-color: #FFFDF9;
+}
+
+body.dark-mode .shop-item-name,
+body.dark-mode .task-text-label {
+  color: #FFFDF9;
+}
+
+body.dark-mode .shop-item-effect {
+  color: var(--color-brown-light);
+}
+
+body.dark-mode .task-input,
+body.dark-mode .session-dropdown {
+  background-color: #2C1E16;
+  color: #FFFDF9;
+  border-color: #FFFDF9;
+}
+
+/* Cafe Upgraded Furniture Styles (matching screenshot) */
+.cafe-rug {
+  position: absolute;
+  background-color: #E2725B;
+  border: 3px dashed #FFF;
+  opacity: 0.8;
+  border-radius: var(--border-radius-sm);
+  z-index: 5;
+  box-shadow: inset 0px 0px 8px rgba(78, 34, 15, 0.15);
+  pointer-events: none;
+}
+
+.cafe-bookshelf {
+  position: absolute;
+  background: linear-gradient(180deg, #9D6638 0%, #9D6638 20%, #4E220F 20%, #4E220F 25%, #9D6638 25%, #9D6638 50%, #4E220F 50%, #4E220F 55%, #9D6638 55%, #9D6638 80%, #4E220F 80%, #4E220F 85%);
+  border: var(--border-retro-thick);
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-solid-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFDF9;
+  font-size: 11px;
+  user-select: none;
+  z-index: 45;
+}
+
+.cafe-sofa {
+  position: absolute;
+  background-color: #EF4444;
+  border: var(--border-retro-thick);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-solid-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 45;
+  user-select: none;
+}
+
+.cafe-plant-pot {
+  position: absolute;
+  font-size: 20px;
+  z-index: 48;
+  user-select: none;
+}
+
+.cafe-pastry-case {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.4);
+  border: var(--border-retro-thin);
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-solid-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  font-size: 14px;
+  backdrop-filter: blur(1px);
+  z-index: 45;
+  user-select: none;
+}
+
+/* Dark Mode support for upgraded elements */
+body.dark-mode .cafe-bookshelf {
+  background: linear-gradient(180deg, #5E3E28 0%, #5E3E28 20%, #2C1E16 20%, #2C1E16 25%, #5E3E28 25%, #5E3E28 50%, #2C1E16 50%, #2C1E16 55%, #5E3E28 55%, #5E3E28 80%, #2C1E16 80%, #2C1E16 85%);
+  border-color: #FFFDF9;
+}
+
+body.dark-mode .cafe-sofa {
+  background-color: #900C3F;
+  border-color: #FFFDF9;
+}
+
+body.dark-mode .cafe-pastry-case {
+  background: rgba(44, 30, 22, 0.5);
+  border-color: #FFFDF9;
+}
+
+body.dark-mode .cafe-rug {
+  background-color: #8B4F3F;
+  border-color: #FFFDF9;
+}

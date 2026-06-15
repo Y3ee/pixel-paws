@@ -3,6 +3,13 @@
 document.addEventListener('DOMContentLoaded', () => {
   const state = window.AppState;
   if (!state) return;
+  
+  // Initial sync from state
+  const coinsEl = document.getElementById('stat-coins');
+  if (coinsEl) coinsEl.textContent = state.coins;
+
+  const badgesCountEl = document.getElementById('nav-badges-count');
+  if (badgesCountEl) badgesCountEl.textContent = state.badges;
 
   // DOM Elements
   const xpEl = document.getElementById('stat-xp');
@@ -14,6 +21,61 @@ document.addEventListener('DOMContentLoaded', () => {
   const joinClubBtn = document.getElementById('join-club-btn');
   const viewProfileBtn = document.getElementById('view-profile-btn');
   const navLinks = document.querySelectorAll('.nav-link');
+
+  // Onboarding DOM Elements
+  const onboardingOverlay = document.getElementById('onboarding-overlay');
+  const progressBar = document.getElementById('onboarding-progress-bar');
+  const skipBtn = document.getElementById('onboarding-skip-btn');
+  const step1 = document.getElementById('onboarding-step-1');
+  const step2 = document.getElementById('onboarding-step-2');
+  const step3 = document.getElementById('onboarding-step-3');
+  const step4 = document.getElementById('onboarding-step-4');
+  const step5 = document.getElementById('onboarding-step-5');
+  const introContinueBtn = document.getElementById('intro-continue-btn');
+  const avatarNextBtn = document.getElementById('avatar-next-btn');
+  const petNextBtn = document.getElementById('pet-next-btn');
+  const usernameInputField = document.getElementById('username-input-field');
+  const validationFeedback = document.getElementById('username-validation-feedback');
+  const usernameContinueBtn = document.getElementById('username-continue-btn');
+  const usernameLaterBtn = document.getElementById('username-later-btn');
+  const usernameAvatarPreview = document.getElementById('username-avatar-preview');
+  const welcomeAvatarChar = document.getElementById('welcome-avatar-char');
+  const welcomeAvatarPet = document.getElementById('welcome-avatar-pet');
+  const step5DialogText = document.getElementById('step5-dialog-text');
+  const finishBtn = document.getElementById('onboarding-finish-btn');
+  
+  const avatarPreviewBox = document.getElementById('avatar-preview-box');
+  const avatarRandomBtn = document.getElementById('avatar-random-btn');
+  const avatarOptionsGrid = document.getElementById('avatar-options-grid');
+  const petSelectCards = document.querySelectorAll('.pet-select-card');
+
+  // Modal DOM Elements
+  const profileModal = document.getElementById('profile-modal');
+  const profileModalClose = document.getElementById('profile-modal-close');
+  const profileEditForm = document.getElementById('profile-edit-form');
+  const profileUsernameInput = document.getElementById('profile-username-input');
+  const profileAgeInput = document.getElementById('profile-age-input');
+  const modalAvatarGrid = document.getElementById('modal-avatar-options-grid');
+  const modalPetGrid = document.getElementById('modal-pet-options-grid');
+  const profileSaveBtn = document.getElementById('profile-save-btn');
+  
+  const achievementsModal = document.getElementById('achievements-modal');
+  const achievementsModalClose = document.getElementById('achievements-modal-close');
+  
+  const achievementsNavIcon = document.querySelector('button[title="Achievements"]');
+  const profileNavIcon = document.querySelector('button[title="Profile"]');
+
+  // Onboarding State trackers
+  let currentAvatarIdx = 0;
+  let currentPetIdx = 0;
+  let currentUsername = "ScholarPaws";
+  
+  // Modal State trackers (temporary until save)
+  let modalAvatarIdx = 0;
+  let modalPetIdx = 0;
+
+  const petSymbols = ["#pet-puppy", "#pet-kitty", "#pet-bunny", "#pet-frog", "#pet-owl"];
+  const petNamesList = ["Puppy", "Kitty", "Bunny", "Frog", "Owl"];
 
   // Typewriter effect for speech bubble
   let speechTimeout;
@@ -53,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Level up
   state.on('levelUp', (data) => {
     if (levelEl) {
-      levelEl.textContent = `Pet Level ${data.level}`;
+      levelEl.textContent = `${state.goals.dailyFocus.claimed ? 'Scholar' + (state.selectedPetIndex === 0 ? 'Puppy' : state.selectedPetIndex === 1 ? 'Kitty' : state.selectedPetIndex === 2 ? 'Bunny' : state.selectedPetIndex === 3 ? 'Frog' : 'Owl') : 'Pet'} Level ${data.level}`;
       levelEl.style.fontWeight = 'bold';
       levelEl.style.color = 'var(--color-orange)';
       setTimeout(() => {
@@ -74,6 +136,89 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Coins change
+  state.on('coinsChange', (data) => {
+    const coinsEl = document.getElementById('stat-coins');
+    if (coinsEl) {
+      coinsEl.style.transform = 'scale(1.25)';
+      coinsEl.style.color = '#D4AF37';
+      coinsEl.textContent = data.coins;
+      setTimeout(() => {
+        coinsEl.style.transform = 'none';
+        coinsEl.style.color = '';
+      }, 300);
+    }
+  });
+
+  // Badges change
+  state.on('badgesChange', (data) => {
+    const badgesEl = document.getElementById('nav-badges-count');
+    if (badgesEl) {
+      badgesEl.style.transform = 'scale(1.3)';
+      badgesEl.textContent = data.badges;
+      setTimeout(() => {
+        badgesEl.style.transform = 'none';
+      }, 300);
+    }
+  });
+
+  // Helper to render the avatar with character + pet overlay
+  function renderDualAvatar(containerBox, charIndex, petIndex) {
+    if (!containerBox) return;
+    const petSymbol = petSymbols[petIndex] || "#pet-puppy";
+    containerBox.innerHTML = `
+      <svg style="width: 100%; height: 100%; padding: 4px;"><use href="#char-avatar-${charIndex}"></use></svg>
+      <div class="pet-avatar-overlay">
+        <svg><use href="${petSymbol}"></use></svg>
+      </div>
+    `;
+  }
+
+  // Onboarding finished state subscriber
+  state.on('onboardingFinished', (data) => {
+    // 1. Update Profile Avatar with dual-avatar representation
+    const profileAvatarBox = document.getElementById('main-profile-avatar-box');
+    renderDualAvatar(profileAvatarBox, data.avatarIndex, data.petIndex);
+
+    // 2. Update Profile Name to selected username
+    if (profileNameEl) {
+      profileNameEl.textContent = data.username;
+    }
+
+    // 3. Update Pet Level name
+    if (levelEl) {
+      levelEl.textContent = `${data.petName} Level 1`;
+    }
+
+    // 4. Unlock the "Lounge Explorer" badge in Achievements Modal
+    const achieveLoungeDate = document.getElementById('achieve-lounge-date');
+    if (achieveLoungeDate) {
+      achieveLoungeDate.textContent = "Unlocked";
+      achieveLoungeDate.style.color = "var(--bg-green)";
+      achieveLoungeDate.style.fontWeight = "bold";
+    }
+
+    // Update the locks or welcome texts
+    typeSpeech(`Welcome back, ${data.username}! Let's study together with your cozy ${data.petName}!`);
+  });
+
+  // Profile updated state subscriber
+  state.on('profileUpdated', (data) => {
+    // 1. Update Profile Avatar with updated selections
+    const profileAvatarBox = document.getElementById('main-profile-avatar-box');
+    renderDualAvatar(profileAvatarBox, data.avatarIndex, data.petIndex);
+
+    // 2. Update Profile Name
+    if (profileNameEl) {
+      profileNameEl.textContent = data.username;
+    }
+
+    // 3. Update Pet Level name
+    if (levelEl) {
+      levelEl.textContent = `${data.petName} Level 1`;
+    }
+  });
+
 
   // --- UI INTERACTION HANDLERS ---
 
@@ -89,38 +234,317 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Get Started button
+  // Get Started button (trig onboarding overlay)
   if (getStartedBtn) {
     getStartedBtn.addEventListener('click', () => {
-      state.trigger('speechChange', {
-        text: "Let's do this! Pick a goal, start a Pomodoro timer, and let's crush it!"
+      if (onboardingOverlay) {
+        onboardingOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Reset steps
+        step1.classList.add('active');
+        step2.classList.remove('active');
+        step3.classList.remove('active');
+        step4.classList.remove('active');
+        step5.classList.remove('active');
+        if (progressBar) progressBar.style.width = '20%';
+
+        // Type onboarding greeting
+        const introText = "Hey there! I'm ScholarPaws, your personal study companion!";
+        const introEl = document.getElementById('intro-dialog-text');
+        if (introEl) {
+          introEl.textContent = '';
+          let idx = 0;
+          function typeIntro() {
+            if (idx < introText.length) {
+              introEl.textContent += introText.charAt(idx);
+              idx++;
+              setTimeout(typeIntro, 15);
+            }
+          }
+          typeIntro();
+        }
+      }
+    });
+  }
+
+  // Onboarding flow step transitions
+  if (introContinueBtn) {
+    introContinueBtn.addEventListener('click', () => {
+      step1.classList.remove('active');
+      step2.classList.add('active');
+      if (progressBar) progressBar.style.width = '40%';
+    });
+  }
+
+  if (avatarNextBtn) {
+    avatarNextBtn.addEventListener('click', () => {
+      step2.classList.remove('active');
+      step3.classList.add('active');
+      if (progressBar) progressBar.style.width = '60%';
+    });
+  }
+
+  if (petNextBtn) {
+    petNextBtn.addEventListener('click', () => {
+      step3.classList.remove('active');
+      step4.classList.add('active');
+      if (progressBar) progressBar.style.width = '80%';
+      
+      // Update avatar preview inside username step
+      if (usernameAvatarPreview) {
+        usernameAvatarPreview.innerHTML = `
+          <svg style="width: 100%; height: 100%;"><use href="#char-avatar-${currentAvatarIdx}"></use></svg>
+        `;
+      }
+    });
+  }
+
+  // Username Input validation
+  if (usernameInputField) {
+    usernameInputField.addEventListener('input', () => {
+      const val = usernameInputField.value.trim();
+      if (val.length >= 2) {
+        validationFeedback.textContent = "✓ Username is available!";
+        validationFeedback.classList.remove('invalid');
+      } else {
+        validationFeedback.textContent = "Username must be at least 2 characters";
+        validationFeedback.classList.add('invalid');
+      }
+    });
+  }
+
+  // Helper to load step 5 Welcome screen
+  function goToWelcomeStep(username) {
+    currentUsername = username;
+    step4.classList.remove('active');
+    step5.classList.add('active');
+    if (progressBar) progressBar.style.width = '100%';
+
+    // Render Character and Pet in Welcome Screen
+    if (welcomeAvatarChar) {
+      welcomeAvatarChar.innerHTML = `<svg><use href="#char-avatar-${currentAvatarIdx}"></use></svg>`;
+    }
+    if (welcomeAvatarPet) {
+      welcomeAvatarPet.innerHTML = `<svg><use href="${petSymbols[currentPetIdx]}"></use></svg>`;
+    }
+
+    // Set Welcome Dialog Text
+    if (step5DialogText) {
+      const petName = petNamesList[currentPetIdx] || "Companion";
+      const welcomeText = `Welcome aboard, ${currentUsername}! Let's dive in to study with your cozy ${petName}!`;
+      step5DialogText.textContent = '';
+      let idx = 0;
+      function typeWelcome() {
+        if (idx < welcomeText.length) {
+          step5DialogText.textContent += welcomeText.charAt(idx);
+          idx++;
+          setTimeout(typeWelcome, 15);
+        }
+      }
+      typeWelcome();
+    }
+  }
+
+  if (usernameContinueBtn) {
+    usernameContinueBtn.addEventListener('click', () => {
+      const val = usernameInputField.value.trim();
+      if (val.length < 2) {
+        validationFeedback.textContent = "Username must be at least 2 characters";
+        validationFeedback.classList.add('invalid');
+        return;
+      }
+      goToWelcomeStep(val);
+    });
+  }
+
+  if (usernameLaterBtn) {
+    usernameLaterBtn.addEventListener('click', () => {
+      goToWelcomeStep("ScholarPaws");
+    });
+  }
+
+  // Finish Onboarding
+  function finishOnboardingFlow() {
+    state.completeOnboarding(currentAvatarIdx, currentPetIdx, currentUsername);
+    if (onboardingOverlay) {
+      onboardingOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  }
+
+  if (finishBtn) {
+    finishBtn.addEventListener('click', finishOnboardingFlow);
+  }
+
+  if (skipBtn) {
+    skipBtn.addEventListener('click', finishOnboardingFlow);
+  }
+
+  // Avatar Options selection grid clicks
+  if (avatarOptionsGrid) {
+    const optionCards = avatarOptionsGrid.querySelectorAll('.customizer-option-card');
+    optionCards.forEach(card => {
+      card.addEventListener('click', () => {
+        optionCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        
+        currentAvatarIdx = parseInt(card.getAttribute('data-avatar-idx')) || 0;
+        
+        // Update avatar preview box
+        if (avatarPreviewBox) {
+          avatarPreviewBox.innerHTML = `
+            <svg style="width: 100%; height: 100%;"><use href="#char-avatar-${currentAvatarIdx}"></use></svg>
+          `;
+        }
       });
     });
   }
 
-  // Join Club button
+  // Random Avatar Selection
+  if (avatarRandomBtn && avatarOptionsGrid) {
+    avatarRandomBtn.addEventListener('click', () => {
+      const optionCards = avatarOptionsGrid.querySelectorAll('.customizer-option-card');
+      const randIndex = Math.floor(Math.random() * optionCards.length);
+      const randCard = optionCards[randIndex];
+      if (randCard) {
+        randCard.click();
+      }
+    });
+  }
+
+  // Pet Card Selection clicks
+  petSelectCards.forEach(card => {
+    card.addEventListener('click', () => {
+      petSelectCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      currentPetIdx = parseInt(card.getAttribute('data-pet-idx')) || 0;
+    });
+  });
+
+  // --- MODALS EVENT LISTENERS ---
+
+  // Achievements Modal open/close
+  if (achievementsNavIcon && achievementsModal) {
+    achievementsNavIcon.addEventListener('click', () => {
+      achievementsModal.classList.add('active');
+    });
+  }
+
+
+
+  if (achievementsModalClose) {
+    achievementsModalClose.addEventListener('click', () => {
+      achievementsModal.classList.remove('active');
+    });
+  }
+
+  // Profile Modal open/close
+  const openProfileModal = () => {
+    if (profileModal) {
+      profileModal.classList.add('active');
+      
+      // Load current state into form inputs
+      if (profileUsernameInput) profileUsernameInput.value = state.username;
+      if (profileAgeInput) profileAgeInput.value = state.age;
+      
+      // Load selection indexes
+      modalAvatarIdx = state.selectedAvatarIndex;
+      modalPetIdx = state.selectedPetIndex;
+      
+      // Mark current avatar active in modal grid
+      if (modalAvatarGrid) {
+        const cards = modalAvatarGrid.querySelectorAll('.customizer-option-card');
+        cards.forEach(c => {
+          c.classList.remove('active');
+          if (parseInt(c.getAttribute('data-avatar-idx')) === modalAvatarIdx) {
+            c.classList.add('active');
+          }
+        });
+      }
+
+      // Mark current pet active in modal grid
+      if (modalPetGrid) {
+        const cards = modalPetGrid.querySelectorAll('.customizer-option-card');
+        cards.forEach(c => {
+          c.classList.remove('active');
+          if (parseInt(c.getAttribute('data-pet-idx')) === modalPetIdx) {
+            c.classList.add('active');
+          }
+        });
+      }
+    }
+  };
+
+  if (profileNavIcon) {
+    profileNavIcon.addEventListener('click', openProfileModal);
+  }
+
+  if (viewProfileBtn) {
+    viewProfileBtn.addEventListener('click', openProfileModal);
+  }
+
+  if (editProfileBtn) {
+    editProfileBtn.addEventListener('click', openProfileModal);
+  }
+
+  if (profileModalClose) {
+    profileModalClose.addEventListener('click', () => {
+      profileModal.classList.remove('active');
+    });
+  }
+
+  // Modal Avatar card selection click
+  if (modalAvatarGrid) {
+    const cards = modalAvatarGrid.querySelectorAll('.customizer-option-card');
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        cards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        modalAvatarIdx = parseInt(card.getAttribute('data-avatar-idx')) || 0;
+      });
+    });
+  }
+
+  // Modal Pet card selection click
+  if (modalPetGrid) {
+    const cards = modalPetGrid.querySelectorAll('.customizer-option-card');
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        cards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        modalPetIdx = parseInt(card.getAttribute('data-pet-idx')) || 0;
+      });
+    });
+  }
+
+  // Save profile edit form submit
+  if (profileEditForm) {
+    profileEditForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const newName = profileUsernameInput.value.trim();
+      const newAge = profileAgeInput.value;
+      
+      state.updateProfileInfo(newName, newAge, modalAvatarIdx, modalPetIdx);
+      profileModal.classList.remove('active');
+    });
+  }
+
+  // Close modals when clicking backdrop
+  window.addEventListener('click', (e) => {
+    if (e.target === profileModal) {
+      profileModal.classList.remove('active');
+    }
+    if (e.target === achievementsModal) {
+      achievementsModal.classList.remove('active');
+    }
+  });
+
+  // Study Lounge nav button click redirect to lounge subpage
   if (joinClubBtn) {
     joinClubBtn.addEventListener('click', () => {
-      state.trigger('speechChange', {
-        text: "Welcome to the Study Lounge Club! You're officially one of the cozy crew now. 🐾"
-      });
-      // Toggle button appearance
-      joinClubBtn.textContent = 'Joined!';
-      joinClubBtn.style.backgroundColor = 'var(--bg-green)';
-      joinClubBtn.style.color = '#FFFDF9';
-      joinClubBtn.disabled = true;
-      joinClubBtn.style.cursor = 'default';
-      joinClubBtn.style.boxShadow = 'none';
-      joinClubBtn.style.transform = 'none';
-    });
-  }
-
-  // View Profile button
-  if (viewProfileBtn) {
-    viewProfileBtn.addEventListener('click', () => {
-      state.trigger('speechChange', {
-        text: "Viewing profile details... Look at all those badges! You're a scholar!"
-      });
+      state.save();
+      window.location.href = 'lounge.html';
     });
   }
 
