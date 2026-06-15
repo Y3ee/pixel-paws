@@ -16,6 +16,13 @@ const AppState = {
   onboardingComplete: false,
   username: 'ScholarPaws',
   age: 20,
+  totalStudyTime: 0,
+  totalRestTime: 0,
+  customTasks: [
+    { id: 'starting-1', text: 'Review math study slides', completed: false },
+    { id: 'starting-2', text: 'Write draft introduction paragraph', completed: false }
+  ],
+  totalTasksCompleted: 0,
   
   // Tamagotchi stats
   petHunger: 100,
@@ -23,10 +30,10 @@ const AppState = {
   petIsDead: false,
   
   goals: {
-    morningBrew: { completed: false, claimed: false, percent: 25, reward: 10 },
-    readNotes: { completed: true, claimed: false, percent: 100, reward: 15 },
-    walkPark: { completed: false, claimed: false, percent: 0, locked: true, reward: 'Rare Item' },
-    dailyFocus: { completed: true, claimed: false, reward: 20 }
+    dailyLogin: { completed: true, claimed: false, percent: 100, reward: 10 },
+    study30Mins: { completed: false, claimed: false, percent: 0, reward: 15 },
+    finishOneTask: { completed: false, claimed: false, percent: 0, reward: 20 },
+    dailyFocus: { completed: false, claimed: false, reward: 20 }
   },
 
   // Listeners for state changes
@@ -73,7 +80,11 @@ const AppState = {
       petHunger: this.petHunger,
       petHealth: this.petHealth,
       petIsDead: this.petIsDead,
-      goals: this.goals
+      goals: this.goals,
+      totalStudyTime: this.totalStudyTime,
+      totalRestTime: this.totalRestTime,
+      customTasks: this.customTasks,
+      totalTasksCompleted: this.totalTasksCompleted
     };
 
     // Save to localStorage as a fallback/backup
@@ -140,7 +151,34 @@ const AppState = {
     if (data.petHunger !== undefined) this.petHunger = data.petHunger;
     if (data.petHealth !== undefined) this.petHealth = data.petHealth;
     if (data.petIsDead !== undefined) this.petIsDead = data.petIsDead;
-    if (data.goals !== undefined) this.goals = data.goals;
+    if (data.goals !== undefined) {
+      if (data.goals.morningBrew || data.goals.readNotes || data.goals.walkPark) {
+        this.goals = {
+          dailyLogin: { completed: true, claimed: false, percent: 100, reward: 10 },
+          study30Mins: { completed: false, claimed: false, percent: 0, reward: 15 },
+          finishOneTask: { completed: false, claimed: false, percent: 0, reward: 20 },
+          dailyFocus: data.goals.dailyFocus || { completed: false, claimed: false, reward: 20 }
+        };
+      } else {
+        this.goals = {
+          dailyLogin: data.goals.dailyLogin || { completed: true, claimed: false, percent: 100, reward: 10 },
+          study30Mins: data.goals.study30Mins || { completed: false, claimed: false, percent: 0, reward: 15 },
+          finishOneTask: data.goals.finishOneTask || { completed: false, claimed: false, percent: 0, reward: 20 },
+          dailyFocus: data.goals.dailyFocus || { completed: false, claimed: false, reward: 20 }
+        };
+      }
+    }
+    this.recalculateGoalsProgress();
+    if (data.totalStudyTime !== undefined) this.totalStudyTime = data.totalStudyTime;
+    if (data.totalRestTime !== undefined) this.totalRestTime = data.totalRestTime;
+    if (data.customTasks !== undefined) this.customTasks = data.customTasks;
+    if (data.totalTasksCompleted !== undefined) this.totalTasksCompleted = data.totalTasksCompleted;
+
+    // Force heal pet to 100% on load/sync to restore it
+    this.petHunger = 100;
+    this.petHealth = 100;
+    this.petIsDead = false;
+    this.save();
   },
 
   // State mutations
@@ -180,7 +218,7 @@ const AppState = {
       }
       
       // Unlock badge on claim
-      if (goalKey === 'readNotes' || goalKey === 'morningBrew') {
+      if (goalKey === 'study30Mins' || goalKey === 'finishOneTask') {
         this.badges += 1;
         this.trigger('badgesChange', { badges: this.badges });
       }
@@ -210,7 +248,7 @@ const AppState = {
     if (newName && newName.trim()) {
       this.petName = newName.trim();
       this.trigger('nameChange', { name: this.petName });
-      this.trigger('speechChange', { text: `Hello, I am now called ${this.petName}! Woof!` });
+      this.trigger('speechChange', { text: `Hello, I am now called ${this.petName}! 🐾` });
       this.save();
     }
   },
@@ -340,6 +378,220 @@ const AppState = {
     this.trigger('speechChange', { text: "Woohoo! Your pet is back on its feet, healthy and happy! Let's keep studying!" });
     this.save();
     return true;
+  },
+
+  recalculateGoalsProgress() {
+    if (!this.goals) return;
+
+    // 1. Daily Login
+    if (this.goals.dailyLogin) {
+      this.goals.dailyLogin.completed = true;
+      this.goals.dailyLogin.percent = 100;
+    }
+
+    // 2. Study for 30mins
+    if (this.goals.study30Mins) {
+      const studyGoal = this.goals.study30Mins;
+      const targetSec = 1800; // 30 minutes
+      const pct = Math.min(100, Math.floor((this.totalStudyTime / targetSec) * 100));
+      studyGoal.percent = pct;
+      if (pct >= 100) {
+        studyGoal.completed = true;
+      } else if (!studyGoal.claimed) {
+        studyGoal.completed = false;
+      }
+    }
+
+    // 3. Finish one task
+    if (this.goals.finishOneTask) {
+      const taskGoal = this.goals.finishOneTask;
+      const anyCompleted = (this.customTasks || []).some(t => t.completed);
+      taskGoal.percent = anyCompleted ? 100 : 0;
+      if (anyCompleted) {
+        taskGoal.completed = true;
+      } else if (!taskGoal.claimed) {
+        taskGoal.completed = false;
+      }
+    }
+
+    // 4. Daily Focus Quest
+    if (this.goals.dailyFocus) {
+      const focusGoal = this.goals.dailyFocus;
+      this.focusPoints = Math.min(30, Math.floor(this.totalStudyTime / 60));
+      this.maxFocusPoints = 30;
+      
+      const isComplete = this.focusPoints >= this.maxFocusPoints;
+      focusGoal.percent = Math.floor((this.focusPoints / this.maxFocusPoints) * 100);
+      
+      if (isComplete) {
+        focusGoal.completed = true;
+      } else if (!focusGoal.claimed) {
+        focusGoal.completed = false;
+      }
+    }
+  },
+
+  addStudySecond() {
+    this.totalStudyTime++;
+    this.trigger('studyTimeChange', { totalStudyTime: this.totalStudyTime });
+    
+    // Update study30Mins goal progress
+    if (this.goals && this.goals.study30Mins) {
+      const studyGoal = this.goals.study30Mins;
+      const targetSec = 1800;
+      const pct = Math.min(100, Math.floor((this.totalStudyTime / targetSec) * 100));
+      
+      let changed = false;
+      if (pct !== studyGoal.percent) {
+        studyGoal.percent = pct;
+        changed = true;
+      }
+      
+      if (pct >= 100 && !studyGoal.completed) {
+        studyGoal.completed = true;
+        this.trigger('speechChange', { text: "Goal complete: Study for 30mins! Go claim your reward!" });
+        changed = true;
+        this.save();
+      }
+      
+      if (changed) {
+        this.trigger('goalsUpdated');
+      }
+    }
+
+    // Update dailyFocus quest progress
+    if (this.goals && this.goals.dailyFocus) {
+      const focusGoal = this.goals.dailyFocus;
+      const prevPoints = this.focusPoints;
+      this.focusPoints = Math.min(30, Math.floor(this.totalStudyTime / 60));
+      this.maxFocusPoints = 30;
+      
+      if (this.focusPoints !== prevPoints) {
+        const pct = Math.floor((this.focusPoints / this.maxFocusPoints) * 100);
+        focusGoal.percent = pct;
+        
+        if (this.focusPoints >= this.maxFocusPoints && !focusGoal.completed) {
+          focusGoal.completed = true;
+          this.trigger('speechChange', { text: "Quest complete: Daily Focus! Claim your reward!" });
+          this.save();
+        }
+        this.trigger('focusProgressUpdated');
+      }
+    }
+
+    if (this.totalStudyTime % 10 === 0) {
+      this.save();
+    }
+  },
+
+  addRestSecond() {
+    this.totalRestTime++;
+    this.trigger('restTimeChange', { totalRestTime: this.totalRestTime });
+    if (this.totalRestTime % 10 === 0) {
+      this.save();
+    }
+  },
+
+  addTask(text) {
+    const task = {
+      id: Date.now().toString() + '_' + Math.random().toString(36).substr(2, 9),
+      text: text,
+      completed: false
+    };
+    if (!this.customTasks) this.customTasks = [];
+    this.customTasks.push(task);
+    this.trigger('tasksChange', { tasks: this.customTasks });
+    this.save();
+    return task;
+  },
+
+  completeTask(id) {
+    if (!this.customTasks) this.customTasks = [];
+    const task = this.customTasks.find(t => t.id === id);
+    if (task && !task.completed) {
+      task.completed = true;
+      this.totalTasksCompleted = (this.totalTasksCompleted || 0) + 1;
+      
+      // Reward 15 coins and 10 XP
+      this.addCoins(15);
+      this.addXp(10);
+      this.trigger('speechChange', { text: "Awesome! Task complete! Earned 15 coins & 10 XP! 💰🎉" });
+      
+      // Trigger hearts effect
+      this.trigger('taskCompletedEffect');
+
+      // Update finishOneTask daily goal progress
+      if (this.goals && this.goals.finishOneTask) {
+        const taskGoal = this.goals.finishOneTask;
+        const prevCompleted = taskGoal.completed;
+        taskGoal.percent = 100;
+        
+        if (!taskGoal.claimed) {
+          taskGoal.completed = true;
+        }
+        
+        if (taskGoal.completed && !prevCompleted) {
+          this.trigger('speechChange', { text: "Goal complete: Finish one task! Go claim your reward!" });
+        }
+        this.trigger('goalsUpdated');
+      }
+
+      this.trigger('tasksChange', { tasks: this.customTasks });
+      this.save();
+    }
+  },
+
+  toggleTask(id) {
+    if (!this.customTasks) this.customTasks = [];
+    const task = this.customTasks.find(t => t.id === id);
+    if (task) {
+      task.completed = !task.completed;
+      this.trigger('tasksChange', { tasks: this.customTasks });
+      
+      // Update finishOneTask goal progress
+      if (this.goals && this.goals.finishOneTask) {
+        const taskGoal = this.goals.finishOneTask;
+        const anyCompleted = this.customTasks.some(t => t.completed);
+        const prevCompleted = taskGoal.completed;
+        taskGoal.percent = anyCompleted ? 100 : 0;
+        
+        if (!taskGoal.claimed) {
+          taskGoal.completed = anyCompleted;
+        }
+        
+        if (taskGoal.completed && !prevCompleted) {
+          this.trigger('speechChange', { text: "Goal complete: Finish one task! Go claim your reward!" });
+        }
+        this.trigger('goalsUpdated');
+      }
+      
+      this.save();
+    }
+  },
+
+  deleteTask(id) {
+    if (!this.customTasks) this.customTasks = [];
+    this.customTasks = this.customTasks.filter(t => t.id !== id);
+    this.trigger('tasksChange', { tasks: this.customTasks });
+    
+    // Update finishOneTask goal progress
+    if (this.goals && this.goals.finishOneTask) {
+      const taskGoal = this.goals.finishOneTask;
+      const anyCompleted = this.customTasks.some(t => t.completed);
+      const prevCompleted = taskGoal.completed;
+      taskGoal.percent = anyCompleted ? 100 : 0;
+      
+      if (!taskGoal.claimed) {
+        taskGoal.completed = anyCompleted;
+      }
+      
+      if (taskGoal.completed && !prevCompleted) {
+        this.trigger('speechChange', { text: "Goal complete: Finish one task! Go claim your reward!" });
+      }
+      this.trigger('goalsUpdated');
+    }
+    
+    this.save();
   }
 };
 
