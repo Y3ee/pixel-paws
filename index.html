@@ -45,7 +45,7 @@
           </button>
           
           <!-- Trophy Icon -->
-          <button class="nav-icon-btn" title="Achievements" aria-label="Achievements">
+          <button class="nav-icon-btn" title="Achievements" aria-label="Achievements" id="achievements-nav-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
               <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
@@ -53,6 +53,7 @@
               <path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"/>
               <path d="M12 2a5 5 0 0 1 5 5v5a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/>
             </svg>
+            <span class="nav-badge-count" id="nav-badges-count">0</span>
           </button>
           
           <!-- User Profile Icon -->
@@ -63,8 +64,8 @@
             </svg>
           </button>
           
-          <!-- Join Club Button -->
-          <button class="retro-btn btn-green-light" id="join-club-btn">Join Club</button>
+          <!-- Study Lounge Button -->
+          <button class="retro-btn btn-green-light" id="join-club-btn">Study Lounge</button>
         </div>
       </nav>
     </header>
@@ -87,15 +88,6 @@
         
         <!-- HERO CARD -->
         <section class="hero-card" aria-label="Welcome">
-          <!-- Decorative Watermark SVGs -->
-          <svg class="watermark-leaf leaf-top-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M12 2C12 2 14 6 17 8C20 10 22 12 22 12C22 12 18 12 15 15C12 18 12 22 12 22C12 22 10 18 7 15C4 12 2 12 2 12C2 12 4 10 7 8C10 6 12 2 12 2Z" />
-            <path d="M12 2V22" stroke-dasharray="2 2" />
-          </svg>
-          <svg class="watermark-leaf leaf-bottom-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M12 2C12 2 14 6 17 8C20 10 22 12 22 12C22 12 18 12 15 15C12 18 12 22 12 22C12 22 10 18 7 15C4 12 2 12 2 12C2 12 4 10 7 8C10 6 12 2 12 2Z" />
-            <path d="M12 2V22" stroke-dasharray="2 2" />
-          </svg>
           
           <div class="hero-image-frame">
             <img src="assets/fireplace_scene.png" alt="Cozy Fireplace Scene">
@@ -251,8 +243,11 @@
         <!-- SCHOLARPAWS PROFILE CARD -->
         <section class="profile-card" aria-label="Pet Profile">
           <div class="profile-header">
-            <div class="profile-avatar">
-              <img src="assets/book_mascot.png" alt="ScholarPaws Avatar" id="profile-mascot-img">
+            <div class="profile-avatar" id="main-profile-avatar-box">
+              <svg style="width: 100%; height: 100%; padding: 4px;"><use href="#char-avatar-0"></use></svg>
+              <div class="pet-avatar-overlay" id="main-profile-pet-overlay">
+                <svg><use href="#pet-puppy"></use></svg>
+              </div>
             </div>
             <div class="profile-title-box">
               <h3 class="profile-name">ScholarPaws</h3>
@@ -289,18 +284,19 @@
               </div>
             </div>
             
-            <!-- Badges Stat -->
-            <div class="stat-item">
-              <div class="stat-icon-wrapper" style="color: #6C757D;">
-                <!-- Badge SVG -->
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
-                  <circle cx="12" cy="8" r="7"/>
-                  <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
+            <!-- Coins Stat -->
+            <div class="stat-item" id="stat-coins-item">
+              <div class="stat-icon-wrapper" style="color: #D4AF37;">
+                <!-- Gold Coin SVG -->
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                  <circle cx="12" cy="12" r="10" fill="#E8C17F" stroke="#4E220F" stroke-width="2"/>
+                  <circle cx="12" cy="12" r="6" fill="none" stroke="#4E220F" stroke-dasharray="2 2"/>
+                  <path d="M12 7v10M10 9h4M10 15h4" stroke="#4E220F" stroke-width="2" stroke-linecap="round"/>
                 </svg>
               </div>
               <div class="stat-text">
-                <span class="stat-value" id="stat-badges">3</span>
-                <span class="stat-label">Badges</span>
+                <span class="stat-value" id="stat-coins">45</span>
+                <span class="stat-label">Total Coins</span>
               </div>
             </div>
             
@@ -367,10 +363,513 @@
     </main>
   </div>
 
+  <!-- ONBOARDING OVERLAY -->
+  <div class="onboarding-overlay" id="onboarding-overlay">
+    <!-- SVG Pixel Assets Store -->
+    <svg style="display: none;">
+      <!-- CHARACTER 0: Farmer Cap Kid -->
+      <symbol id="char-avatar-0" viewBox="0 0 16 16">
+        <!-- cap -->
+        <rect x="5" y="1" width="7" height="2" fill="#E28D75"/>
+        <rect x="4" y="2" width="7" height="1" fill="#E28D75"/>
+        <!-- hair -->
+        <rect x="3" y="3" width="10" height="2" fill="#9D174D"/>
+        <rect x="2" y="5" width="2" height="3" fill="#9D174D"/>
+        <rect x="12" y="5" width="2" height="3" fill="#9D174D"/>
+        <!-- skin -->
+        <rect x="4" y="4" width="8" height="6" fill="#FCD5C8"/>
+        <!-- eyes -->
+        <rect x="5" y="6" width="1" height="2" fill="#4E3629"/>
+        <rect x="10" y="6" width="1" height="2" fill="#4E3629"/>
+        <!-- blush -->
+        <rect x="4" y="8" width="1" height="1" fill="#F43F5E" opacity="0.6"/>
+        <rect x="11" y="8" width="1" height="1" fill="#F43F5E" opacity="0.6"/>
+        <!-- mouth -->
+        <rect x="7" y="8" width="2" height="1" fill="#4E3629"/>
+        <!-- shirt -->
+        <rect x="4" y="10" width="8" height="2" fill="#FBBF24"/>
+        <!-- overalls -->
+        <rect x="5" y="11" width="6" height="4" fill="#6366F1"/>
+        <rect x="4" y="12" width="1" height="3" fill="#6366F1"/>
+        <rect x="11" y="12" width="1" height="3" fill="#6366F1"/>
+        <!-- boots -->
+        <rect x="4" y="15" width="2" height="1" fill="#4E3629"/>
+        <rect x="10" y="15" width="2" height="1" fill="#4E3629"/>
+      </symbol>
+
+      <!-- CHARACTER 1: Pink Goth -->
+      <symbol id="char-avatar-1" viewBox="0 0 16 16">
+        <!-- hair back -->
+        <rect x="3" y="2" width="10" height="10" fill="#EC4899"/>
+        <!-- skin -->
+        <rect x="4" y="4" width="8" height="6" fill="#FFF1F2"/>
+        <!-- hair front/bangs -->
+        <rect x="3" y="3" width="10" height="2" fill="#D946EF"/>
+        <rect x="3" y="5" width="2" height="4" fill="#D946EF"/>
+        <rect x="11" y="5" width="2" height="4" fill="#D946EF"/>
+        <!-- eyes -->
+        <rect x="5" y="6" width="1" height="2" fill="#1E293B"/>
+        <rect x="10" y="6" width="1" height="2" fill="#1E293B"/>
+        <!-- mouth -->
+        <rect x="7" y="8" width="2" height="1" fill="#9D174D"/>
+        <!-- shirt -->
+        <rect x="4" y="10" width="8" height="5" fill="#111827"/>
+        <rect x="6" y="10" width="4" height="2" fill="#FFF1F2"/>
+        <!-- boots -->
+        <rect x="4" y="15" width="2" height="1" fill="#4E3629"/>
+        <rect x="10" y="15" width="2" height="1" fill="#4E3629"/>
+      </symbol>
+
+      <!-- CHARACTER 2: Helmet Robot -->
+      <symbol id="char-avatar-2" viewBox="0 0 16 16">
+        <!-- helmet base -->
+        <rect x="3" y="2" width="10" height="9" fill="#E2E8F0"/>
+        <rect x="2" y="3" width="12" height="7" fill="#E2E8F0"/>
+        <!-- stripes -->
+        <rect x="7" y="2" width="2" height="2" fill="#F97316"/>
+        <!-- visor screen border -->
+        <rect x="4" y="4" width="8" height="5" fill="#1E293B"/>
+        <!-- visor screen -->
+        <rect x="5" y="5" width="6" height="3" fill="#0EA5E9"/>
+        <!-- face screen eyes -->
+        <rect x="6" y="6" width="1" height="1" fill="#E0F2FE"/>
+        <rect x="9" y="6" width="1" height="1" fill="#E0F2FE"/>
+        <!-- neck -->
+        <rect x="6" y="11" width="4" height="1" fill="#64748B"/>
+        <!-- suit -->
+        <rect x="4" y="12" width="8" height="3" fill="#F8FAFC"/>
+        <rect x="3" y="13" width="1" height="2" fill="#F97316"/>
+        <rect x="12" y="13" width="1" height="2" fill="#F97316"/>
+        <!-- boots -->
+        <rect x="4" y="15" width="3" height="1" fill="#475569"/>
+        <rect x="9" y="15" width="3" height="1" fill="#475569"/>
+      </symbol>
+
+      <!-- CHARACTER 3: Cat Ears -->
+      <symbol id="char-avatar-3" viewBox="0 0 16 16">
+        <!-- cat ears cap -->
+        <rect x="3" y="2" width="2" height="2" fill="#E2E8F0"/>
+        <rect x="11" y="2" width="2" height="2" fill="#E2E8F0"/>
+        <rect x="3" y="3" width="10" height="7" fill="#F1F5F9"/>
+        <!-- inner ears -->
+        <rect x="3.5" y="2.5" width="1" height="1" fill="#FDA4AF"/>
+        <rect x="11.5" y="2.5" width="1" height="1" fill="#FDA4AF"/>
+        <!-- hair -->
+        <rect x="4" y="5" width="8" height="1" fill="#F59E0B"/>
+        <rect x="3" y="6" width="1" height="3" fill="#F59E0B"/>
+        <rect x="12" y="6" width="1" height="3" fill="#F59E0B"/>
+        <!-- face skin -->
+        <rect x="4" y="6" width="8" height="4" fill="#FFEDD5"/>
+        <!-- eyes -->
+        <rect x="5" y="7" width="1" height="2" fill="#4E3629"/>
+        <rect x="10" y="7" width="1" height="2" fill="#4E3629"/>
+        <!-- mouth -->
+        <rect x="7" y="9" width="2" height="1" fill="#E28D75"/>
+        <!-- hoodie -->
+        <rect x="4" y="10" width="8" height="5" fill="#3F3F46"/>
+        <rect x="3" y="11" width="10" height="4" fill="#3F3F46"/>
+        <!-- boots -->
+        <rect x="4" y="15" width="2" height="1" fill="#18181B"/>
+        <rect x="10" y="15" width="2" height="1" fill="#18181B"/>
+      </symbol>
+
+      <!-- CHARACTER 4: Blue Space Girl -->
+      <symbol id="char-avatar-4" viewBox="0 0 16 16">
+        <!-- hair back -->
+        <rect x="3" y="3" width="10" height="8" fill="#0284C7"/>
+        <!-- skin -->
+        <rect x="4" y="4" width="8" height="6" fill="#FEE2E2"/>
+        <!-- hair front/bangs -->
+        <rect x="3" y="3" width="10" height="2" fill="#38BDF8"/>
+        <rect x="3" y="5" width="2" height="4" fill="#38BDF8"/>
+        <rect x="11" y="5" width="2" height="4" fill="#38BDF8"/>
+        <!-- eyes -->
+        <rect x="5" y="6" width="1" height="2" fill="#0F172A"/>
+        <rect x="10" y="6" width="1" height="2" fill="#0F172A"/>
+        <!-- mouth -->
+        <rect x="7" y="8" width="2" height="1" fill="#EF4444"/>
+        <!-- space outfit -->
+        <rect x="4" y="10" width="8" height="5" fill="#E0F2FE"/>
+        <!-- belt -->
+        <rect x="4" y="12" width="8" height="1" fill="#0EA5E9"/>
+        <!-- boots -->
+        <rect x="4" y="15" width="2" height="1" fill="#0284C7"/>
+        <rect x="10" y="15" width="2" height="1" fill="#0284C7"/>
+      </symbol>
+
+      <!-- PET 0: Puppy -->
+      <symbol id="pet-puppy" viewBox="0 0 16 16">
+        <!-- floppy ears -->
+        <rect x="2" y="3" width="2" height="6" fill="#78350F"/>
+        <rect x="12" y="3" width="2" height="6" fill="#78350F"/>
+        <!-- head -->
+        <rect x="4" y="2" width="8" height="9" fill="#D97706"/>
+        <rect x="3" y="4" width="10" height="6" fill="#D97706"/>
+        <!-- snout/muzzle -->
+        <rect x="6" y="7" width="4" height="4" fill="#FFFBEB"/>
+        <!-- nose -->
+        <rect x="7" y="7" width="2" height="2" fill="#1E293B"/>
+        <!-- eyes -->
+        <rect x="5" y="5" width="1" height="2" fill="#1E293B"/>
+        <rect x="10" y="5" width="1" height="2" fill="#1E293B"/>
+        <!-- tongue -->
+        <rect x="7.5" y="9" width="1" height="2" fill="#F43F5E"/>
+      </symbol>
+
+      <!-- PET 1: Kitty -->
+      <symbol id="pet-kitty" viewBox="0 0 16 16">
+        <!-- pointy ears -->
+        <rect x="3" y="2" width="2" height="2" fill="#D97706"/>
+        <rect x="11" y="2" width="2" height="2" fill="#D97706"/>
+        <rect x="4" y="3" width="1" height="1" fill="#FDA4AF"/>
+        <rect x="11" y="3" width="1" height="1" fill="#FDA4AF"/>
+        <!-- head -->
+        <rect x="3" y="4" width="10" height="7" fill="#F59E0B"/>
+        <rect x="4" y="5" width="8" height="6" fill="#F59E0B"/>
+        <!-- eyes -->
+        <rect x="5" y="6" width="1" height="2" fill="#1E293B"/>
+        <rect x="10" y="6" width="1" height="2" fill="#1E293B"/>
+        <rect x="5" y="6" width="1" height="1" fill="#A7F3D0"/>
+        <rect x="10" y="6" width="1" height="1" fill="#A7F3D0"/>
+        <!-- nose -->
+        <rect x="7.5" y="8.5" width="1" height="1" fill="#FDA4AF"/>
+        <!-- whiskers -->
+        <line x1="2" y1="8" x2="5" y2="8" stroke="#FFFBEB" stroke-width="1"/>
+        <line x1="11" y1="8" x2="14" y2="8" stroke="#FFFBEB" stroke-width="1"/>
+      </symbol>
+
+      <!-- PET 2: Bunny -->
+      <symbol id="pet-bunny" viewBox="0 0 16 16">
+        <!-- long ears -->
+        <rect x="4" y="1" width="2" height="5" fill="#F1F5F9"/>
+        <rect x="10" y="1" width="2" height="5" fill="#F1F5F9"/>
+        <rect x="4.5" y="2" width="1" height="3" fill="#FECDD3"/>
+        <rect x="10.5" y="2" width="1" height="3" fill="#FECDD3"/>
+        <!-- head -->
+        <rect x="3" y="5" width="10" height="7" fill="#F8FAFC"/>
+        <rect x="4" y="6" width="8" height="6" fill="#F8FAFC"/>
+        <!-- eyes -->
+        <rect x="5" y="7" width="1" height="2" fill="#1E293B"/>
+        <rect x="10" y="7" width="1" height="2" fill="#1E293B"/>
+        <!-- nose/mouth -->
+        <rect x="7.5" y="9" width="1" height="1" fill="#FDA4AF"/>
+        <rect x="7" y="10" width="2" height="1" fill="#E2E8F0"/>
+      </symbol>
+
+      <!-- PET 3: Frog -->
+      <symbol id="pet-frog" viewBox="0 0 16 16">
+        <!-- big eyes -->
+        <circle cx="5" cy="4" r="2" fill="#10B981"/>
+        <circle cx="11" cy="4" r="2" fill="#10B981"/>
+        <circle cx="5" cy="4" r="1" fill="#F8FAFC"/>
+        <circle cx="11" cy="4" r="1" fill="#F8FAFC"/>
+        <circle cx="5" cy="4" r="0.5" fill="#0F172A"/>
+        <circle cx="11" cy="4" r="0.5" fill="#0F172A"/>
+        <!-- head -->
+        <rect x="3" y="5" width="10" height="7" fill="#10B981"/>
+        <rect x="2" y="6" width="12" height="5" fill="#10B981"/>
+        <!-- rosy cheeks -->
+        <rect x="3" y="8" width="1.5" height="1" fill="#FDA4AF" opacity="0.8"/>
+        <rect x="11.5" y="8" width="1.5" height="1" fill="#FDA4AF" opacity="0.8"/>
+        <!-- mouth -->
+        <path d="M5 8.5C5 9.5 7 10 8 10C9 10 11 9.5 11 8.5" stroke="#065F46" stroke-width="1" stroke-linecap="round" fill="none"/>
+      </symbol>
+
+      <!-- PET 4: Owl -->
+      <symbol id="pet-owl" viewBox="0 0 16 16">
+        <!-- horns/feathers -->
+        <polygon points="3,2 5,4 3,4" fill="#78350F"/>
+        <polygon points="13,2 11,4 13,4" fill="#78350F"/>
+        <!-- head/body -->
+        <rect x="3" y="3" width="10" height="10" fill="#92400E"/>
+        <rect x="4" y="4" width="8" height="8" fill="#92400E"/>
+        <!-- big eyes outlines -->
+        <circle cx="5.5" cy="6.5" r="2.5" fill="#FBBF24"/>
+        <circle cx="10.5" cy="6.5" r="2.5" fill="#FBBF24"/>
+        <circle cx="5.5" cy="6.5" r="1" fill="#0F172A"/>
+        <circle cx="10.5" cy="6.5" r="1" fill="#0F172A"/>
+        <!-- beak -->
+        <polygon points="8,7.5 7.5,9.5 8.5,9.5" fill="#D97706"/>
+        <!-- chest feathers -->
+        <rect x="5" y="10" width="6" height="3" fill="#FFFBEB"/>
+        <rect x="6" y="10.5" width="4" height="2" fill="#D97706" opacity="0.3"/>
+      </symbol>
+    </svg>
+
+    <!-- ONBOARDING HEADER -->
+    <div class="onboarding-header">
+      <div class="onboarding-progress-container">
+        <div class="onboarding-progress-bar" id="onboarding-progress-bar"></div>
+      </div>
+      <button class="onboarding-skip-btn" id="onboarding-skip-btn">Skip</button>
+    </div>
+
+    <!-- STEP 1: INTRODUCTION -->
+    <div class="onboarding-step active" id="onboarding-step-1">
+      <div class="onboarding-mascot-large">
+        <img src="assets/book_mascot.png" alt="ScholarPaws Mascot">
+      </div>
+      <div class="onboarding-dialog">
+        <div class="onboarding-dialog-content">
+          <p class="onboarding-dialog-text" id="intro-dialog-text">Hey there! I'm ScholarPaws, your personal study companion!</p>
+        </div>
+      </div>
+      <button class="onboarding-btn-primary" id="intro-continue-btn">Continue</button>
+    </div>
+
+    <!-- STEP 2: CHARACTER CUSTOMIZATION -->
+    <div class="onboarding-step onboarding-step-with-sidebar" id="onboarding-step-2">
+      <div class="onboarding-dialog">
+        <div class="onboarding-dialog-mascot-small">
+          <img src="assets/book_mascot.png" alt="ScholarPaws">
+        </div>
+        <div class="onboarding-dialog-content">
+          <p class="onboarding-dialog-text">First, let's choose your look. You can switch this up later, too.</p>
+        </div>
+      </div>
+
+      <div class="customizer-container">
+        <!-- Preview Column -->
+        <div class="customizer-preview-pane">
+          <div class="customizer-preview-avatar" id="avatar-preview-box">
+            <!-- Selected SVG loaded here -->
+            <svg><use href="#char-avatar-0"></use></svg>
+          </div>
+          <button class="customizer-random-btn" id="avatar-random-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            Random
+          </button>
+        </div>
+        <!-- Selection Options Column -->
+        <div class="customizer-menu-pane">
+          <div class="customizer-section">
+            <h4 class="customizer-section-title">Character</h4>
+            <div class="customizer-options-grid" id="avatar-options-grid">
+              <!-- Grid of selectable avatars -->
+              <div class="customizer-option-card active" data-avatar-idx="0">
+                <svg><use href="#char-avatar-0"></use></svg>
+              </div>
+              <div class="customizer-option-card" data-avatar-idx="1">
+                <svg><use href="#char-avatar-1"></use></svg>
+              </div>
+              <div class="customizer-option-card" data-avatar-idx="2">
+                <svg><use href="#char-avatar-2"></use></svg>
+              </div>
+              <div class="customizer-option-card" data-avatar-idx="3">
+                <svg><use href="#char-avatar-3"></use></svg>
+              </div>
+              <div class="customizer-option-card" data-avatar-idx="4">
+                <svg><use href="#char-avatar-4"></use></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="onboarding-nav-actions">
+        <button class="onboarding-btn-primary" id="avatar-next-btn">Choose Pet</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: PET SELECTION -->
+    <div class="onboarding-step onboarding-step-with-sidebar" id="onboarding-step-3">
+      <div class="onboarding-dialog">
+        <div class="onboarding-dialog-mascot-small">
+          <img src="assets/book_mascot.png" alt="ScholarPaws">
+        </div>
+        <div class="onboarding-dialog-content">
+          <p class="onboarding-dialog-text">Now, let's choose a study pet to join you in the lounge!</p>
+        </div>
+      </div>
+
+      <div class="pets-grid">
+        <!-- Puppy -->
+        <div class="pet-select-card active" data-pet-idx="0">
+          <div class="pet-select-icon-box">
+            <svg><use href="#pet-puppy"></use></svg>
+          </div>
+          <span class="pet-select-name">Puppy</span>
+          <span class="pet-select-desc">Loyal and energetic, loves Pomodoros!</span>
+        </div>
+        <!-- Kitty -->
+        <div class="pet-select-card" data-pet-idx="1">
+          <div class="pet-select-icon-box">
+            <svg><use href="#pet-kitty"></use></svg>
+          </div>
+          <span class="pet-select-name">Kitty</span>
+          <span class="pet-select-desc">Purrs softly to help you read and write.</span>
+        </div>
+        <!-- Bunny -->
+        <div class="pet-select-card" data-pet-idx="2">
+          <div class="pet-select-icon-box">
+            <svg><use href="#pet-bunny"></use></svg>
+          </div>
+          <span class="pet-select-name">Bunny</span>
+          <span class="pet-select-desc">Quiet and cozy, perfect for study guides.</span>
+        </div>
+        <!-- Frog -->
+        <div class="pet-select-card" data-pet-idx="3">
+          <div class="pet-select-icon-box">
+            <svg><use href="#pet-frog"></use></svg>
+          </div>
+          <span class="pet-select-name">Frog</span>
+          <span class="pet-select-desc">Leaps forward in focus, loves green tea.</span>
+        </div>
+        <!-- Owl -->
+        <div class="pet-select-card" data-pet-idx="4">
+          <div class="pet-select-icon-box">
+            <svg><use href="#pet-owl"></use></svg>
+          </div>
+          <span class="pet-select-name">Owl</span>
+          <span class="pet-select-desc">Wise and silent, keeps streaks alive!</span>
+        </div>
+      </div>
+
+      <div class="onboarding-nav-actions">
+        <button class="onboarding-btn-primary" id="pet-next-btn">Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: USERNAME SELECTION -->
+    <div class="onboarding-step" id="onboarding-step-4">
+      <div class="onboarding-dialog">
+        <div class="onboarding-dialog-mascot-small">
+          <img src="assets/book_mascot.png" alt="ScholarPaws">
+        </div>
+        <div class="onboarding-dialog-content">
+          <p class="onboarding-dialog-text">Looking good! What should I call you?</p>
+        </div>
+      </div>
+      
+      <div class="welcome-avatar-wrapper" style="width: 90px; height: 90px; margin-bottom: var(--spacing-sm);" id="username-avatar-preview">
+        <svg><use href="#char-avatar-0"></use></svg>
+      </div>
+
+      <div class="username-input-container">
+        <input type="text" class="username-input" id="username-input-field" placeholder="Enter username..." maxlength="15">
+        <div class="username-feedback" id="username-validation-feedback"></div>
+        <button class="onboarding-btn-primary" style="width: 100%; margin-top: 10px;" id="username-continue-btn">Continue</button>
+        <button class="onboarding-decide-later-btn" style="width: 100%;" id="username-later-btn">I'll decide later</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: WELCOME / DIVE IN -->
+    <div class="onboarding-step" id="onboarding-step-5">
+      <div class="onboarding-dialog">
+        <div class="onboarding-dialog-mascot-small">
+          <img src="assets/book_mascot.png" alt="ScholarPaws">
+        </div>
+        <div class="onboarding-dialog-content">
+          <p class="onboarding-dialog-text" id="step5-dialog-text">Welcome aboard, ScholarPaws! Let's dive in to study!</p>
+        </div>
+      </div>
+
+      <div class="welcome-avatars-box">
+        <div class="welcome-avatar-wrapper" id="welcome-avatar-char">
+          <svg><use href="#char-avatar-0"></use></svg>
+        </div>
+        <div style="font-size: 24px; color: var(--color-brown); font-weight: bold; margin: 0 var(--spacing-sm);">+</div>
+        <div class="welcome-avatar-wrapper" id="welcome-avatar-pet">
+          <svg><use href="#pet-puppy"></use></svg>
+        </div>
+      </div>
+
+      <div class="onboarding-nav-actions">
+        <button class="onboarding-btn-primary" id="onboarding-finish-btn">Enter Study Lounge</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE EDIT MODAL -->
+  <div class="modal-backdrop" id="profile-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Profile Details</h3>
+        <button class="modal-close-btn" id="profile-modal-close">&times;</button>
+      </div>
+      <form class="profile-form" id="profile-edit-form" onsubmit="event.preventDefault();">
+        <div class="form-group">
+          <label class="form-label" for="profile-username-input">Username</label>
+          <input type="text" class="form-input" id="profile-username-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="profile-age-input">Age</label>
+          <input type="number" class="form-input" id="profile-age-input" min="1" max="120" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="profile-petname-input">Pet Name</label>
+          <input type="text" class="form-input" id="profile-petname-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Character Look</label>
+          <div class="customizer-options-grid" id="modal-avatar-options-grid" style="grid-template-columns: repeat(5, 1fr); margin-top: 4px; gap: 8px;">
+            <div class="customizer-option-card" data-avatar-idx="0"><svg><use href="#char-avatar-0"></use></svg></div>
+            <div class="customizer-option-card" data-avatar-idx="1"><svg><use href="#char-avatar-1"></use></svg></div>
+            <div class="customizer-option-card" data-avatar-idx="2"><svg><use href="#char-avatar-2"></use></svg></div>
+            <div class="customizer-option-card" data-avatar-idx="3"><svg><use href="#char-avatar-3"></use></svg></div>
+            <div class="customizer-option-card" data-avatar-idx="4"><svg><use href="#char-avatar-4"></use></svg></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Study Pet</label>
+          <div class="customizer-options-grid" id="modal-pet-options-grid" style="grid-template-columns: repeat(5, 1fr); margin-top: 4px; gap: 8px;">
+            <div class="customizer-option-card" data-pet-idx="0"><svg><use href="#pet-puppy"></use></svg></div>
+            <div class="customizer-option-card" data-pet-idx="1"><svg><use href="#pet-kitty"></use></svg></div>
+            <div class="customizer-option-card" data-pet-idx="2"><svg><use href="#pet-bunny"></use></svg></div>
+            <div class="customizer-option-card" data-pet-idx="3"><svg><use href="#pet-frog"></use></svg></div>
+            <div class="customizer-option-card" data-pet-idx="4"><svg><use href="#pet-owl"></use></svg></div>
+          </div>
+        </div>
+        <button type="submit" class="onboarding-btn-primary" style="margin-top: 10px; width: 100%;" id="profile-save-btn">Save changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ACHIEVEMENTS / BADGES MODAL -->
+  <div class="modal-backdrop" id="achievements-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Achievements & Badges</h3>
+        <button class="modal-close-btn" id="achievements-modal-close">&times;</button>
+      </div>
+      <div class="achievements-list">
+        <!-- Achievement 1 -->
+        <div class="achievement-item">
+          <div class="achievement-icon-box">☕</div>
+          <div class="achievement-info">
+            <h4 class="achievement-name">Morning Brew</h4>
+            <p class="achievement-desc">Complete your first Pomodoro session of the day.</p>
+          </div>
+          <span class="achievement-date">Locked</span>
+        </div>
+        <!-- Achievement 2 -->
+        <div class="achievement-item">
+          <div class="achievement-icon-box">📖</div>
+          <div class="achievement-info">
+            <h4 class="achievement-name">Notes Master</h4>
+            <p class="achievement-desc">Complete a 15-minute notes review study goal.</p>
+          </div>
+          <span class="achievement-date" id="achieve-notes-date">Locked</span>
+        </div>
+        <!-- Achievement 3 -->
+        <div class="achievement-item">
+          <div class="achievement-icon-box">🐾</div>
+          <div class="achievement-info">
+            <h4 class="achievement-name">Lounge Explorer</h4>
+            <p class="achievement-desc">Welcome a study pet companion into the lounge.</p>
+          </div>
+          <span class="achievement-date" id="achieve-lounge-date">Locked</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Javascript Modules -->
-  <script src="scripts/state.js"></script>
-  <script src="scripts/theme.js"></script>
-  <script src="scripts/goals.js"></script>
-  <script src="scripts/app.js"></script>
+  <script type="module" src="scripts/state.js"></script>
+  <script type="module" src="scripts/theme.js"></script>
+  <script type="module" src="scripts/goals.js"></script>
+  <script type="module" src="scripts/app.js"></script>
 </body>
 </html>

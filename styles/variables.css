@@ -4,18 +4,18 @@
 
 :root {
   /* Color Palette */
-  --bg-primary: #FFF9F2;
+  --bg-primary: #F7F1DE;
   --bg-card: #FFFFFF;
-  --color-brown: #4E3629;
-  --color-brown-light: #8E7568;
-  --bg-peach: #FCD5C8;
-  --bg-peach-light: #FFEFEA;
-  --bg-green: #92A682;
-  --bg-green-light: #B5C4AD;
-  --bg-green-soft: #D7E0D3;
-  --color-yellow: #E9B872;
-  --color-orange: #E28D75;
-  --color-gray-locked: #EBE5DD;
+  --color-brown: #4E220F;
+  --color-brown-light: #7C503D;
+  --bg-peach: #9D6638;
+  --bg-peach-light: #FFFDF9;
+  --bg-green: #B0BA99;
+  --bg-green-light: #C9D0B8;
+  --bg-green-soft: #DCE2CE;
+  --color-yellow: #E8C17F;
+  --color-orange: #9D6638;
+  --color-gray-locked: #D9D2BE;
 
   /* Font Families */
   --font-header: 'Fredoka', 'Outfit', sans-serif;
