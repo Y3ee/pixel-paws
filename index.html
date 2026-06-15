@@ -30,9 +30,8 @@
         </div>
         
         <ul class="nav-links">
-          <li><span class="nav-link active" data-tab="learn">Learn</span></li>
-          <li><span class="nav-link" data-tab="practice">Practice</span></li>
-          <li><span class="nav-link" data-tab="build">Build</span></li>
+          <li><span class="nav-link active" data-tab="learn">Home</span></li>
+          <li><span class="nav-link" data-tab="mypet">My Pet</span></li>
           <li><span class="nav-link" data-tab="community">Community</span></li>
         </ul>
         
@@ -104,134 +103,144 @@
           </button>
         </section>
         
+        <!-- FOCUS DASHBOARD SECTION -->
+        <section aria-labelledby="dashboard-title">
+          <div class="section-header">
+            <h2 class="section-title" id="dashboard-title">Focus Dashboard</h2>
+            <div class="carousel-nav-arrows">
+              <button class="carousel-arrow" id="carousel-prev" aria-label="Previous card">&larr;</button>
+              <button class="carousel-arrow" id="carousel-next" aria-label="Next card">&rarr;</button>
+            </div>
+          </div>
+          
+          <div class="dashboard-carousel-container" id="dashboard-carousel-container">
+            <div class="dashboard-carousel-track" id="dashboard-carousel-track">
+              
+              <!-- Card 1: Study Time -->
+              <div class="dashboard-card study-card">
+                <div class="dashboard-card-header">
+                  <h3 class="dashboard-card-title">Study Time</h3>
+                </div>
+                <div class="dashboard-card-body">
+                  <div class="time-large" id="study-time-display">0h 0m</div>
+                  <p class="time-desc">Keep focused in the Lounge to earn coins & XP!</p>
+                </div>
+              </div>
+
+              <!-- Card 2: Rest Time -->
+              <div class="dashboard-card rest-card">
+                <div class="dashboard-card-header">
+                  <h3 class="dashboard-card-title">Rest Time</h3>
+                </div>
+                <div class="dashboard-card-body">
+                  <div class="time-large" id="rest-time-display">0h 0m</div>
+                  <p class="time-desc">Taking regular breaks keeps your pet healthy!</p>
+                </div>
+              </div>
+
+              <!-- Card 3: Custom Tasks -->
+              <div class="dashboard-card tasks-card">
+                <div class="dashboard-card-header">
+                  <h3 class="dashboard-card-title">Active Goals <span id="tasks-progress">(0/0)</span></h3>
+                </div>
+                <div class="dashboard-card-body">
+                  <div class="todo-widget">
+                    <form id="todo-form" class="todo-form" onsubmit="event.preventDefault();">
+                      <input type="text" id="todo-input" class="todo-input" placeholder="Type a new goal..." required maxlength="40">
+                      <button type="submit" class="todo-add-btn">+</button>
+                    </form>
+                    <ul id="todo-list" class="todo-list">
+                      <!-- Dynamically rendered -->
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
         <!-- DAILY GOALS SECTION -->
-        <section aria-labelledby="daily-goals-title">
+        <section aria-labelledby="daily-goals-title" style="margin-top: var(--spacing-xl);">
           <div class="section-header">
             <h2 class="section-title" id="daily-goals-title">Daily Goals</h2>
             <span class="section-link" id="explore-park-link">Explore the Park &darr;</span>
           </div>
           
-          <div class="goals-grid">
-            <!-- Goal 1: Morning Brew -->
-            <article class="goal-card" id="goal-morning-brew">
+          <div class="goals-grid" id="goals-grid">
+            <!-- Goal 1: Daily Login -->
+            <article class="goal-card" id="goal-daily-login">
               <div class="goal-header">
-                <span class="goal-tag tag-focus">Focus</span>
-                <span class="goal-icon" title="Morning Brew Icon">
-                  <!-- Coffee cup SVG -->
+                <span class="goal-tag tag-learn">Daily</span>
+                <span class="goal-icon" title="Daily Login Icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
-                    <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
-                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
-                    <line x1="6" y1="2" x2="6" y2="4"/>
-                    <line x1="10" y1="2" x2="10" y2="4"/>
-                    <line x1="14" y1="2" x2="14" y2="4"/>
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                    <line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/>
+                    <line x1="3" y1="10" x2="21" y2="10"/>
                   </svg>
                 </span>
               </div>
-              <h3 class="goal-title">Morning Brew</h3>
-              <p class="goal-desc">Complete one 25 minute Pomodoro session.</p>
-              <div class="goal-footer">
-                <div class="retro-progress-bar">
-                  <div class="retro-progress-fill" style="width: 25%;"></div>
-                </div>
-                <div class="goal-progress-container">
-                  <span>25%</span>
-                  <span class="goal-reward">Reward: 10 Coins</span>
-                </div>
-              </div>
-            </article>
-            
-            <!-- Goal 2: Read Notes -->
-            <article class="goal-card" id="goal-read-notes">
-              <div class="goal-header">
-                <span class="goal-tag tag-learn">Learn</span>
-                <span class="goal-icon" title="Read Notes Icon">
-                  <!-- Book SVG -->
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                  </svg>
-                </span>
-              </div>
-              <h3 class="goal-title">Read Notes</h3>
-              <p class="goal-desc">Review your study study notes for 15 minutes.</p>
-              <div class="goal-footer" id="read-notes-footer">
+              <h3 class="goal-title">Daily Login</h3>
+              <p class="goal-desc">Log in today to start your study journey!</p>
+              <div class="goal-footer" id="goal-daily-login-footer">
                 <div class="retro-progress-bar">
                   <div class="retro-progress-fill" style="width: 100%;"></div>
                 </div>
                 <div class="goal-progress-container">
                   <span>100%</span>
-                  <button class="retro-btn claim-btn" id="claim-goal-btn">Claim 15 Coins</button>
+                  <button class="retro-btn claim-btn" data-goal="dailyLogin">Claim 10 Coins</button>
                 </div>
               </div>
             </article>
             
-            <!-- Goal 3: Walk in Park -->
-            <article class="goal-card" id="goal-walk-park">
+            <!-- Goal 2: Study for 30mins -->
+            <article class="goal-card" id="goal-study-30mins">
               <div class="goal-header">
-                <span class="goal-tag tag-petcare">Pet Care</span>
-                <span class="goal-icon" title="Walk in Park Icon">
-                  <!-- Paw SVG -->
+                <span class="goal-tag tag-focus">Focus</span>
+                <span class="goal-icon" title="Study for 30mins Icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
-                    <path d="M12 14c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z"/>
-                    <path d="M12 18c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
-                    <circle cx="6" cy="7" r="2"/>
-                    <circle cx="10" cy="4" r="2"/>
-                    <circle cx="14" cy="4" r="2"/>
-                    <circle cx="18" cy="7" r="2"/>
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
                   </svg>
                 </span>
               </div>
-              <h3 class="goal-title">Walk in Park</h3>
-              <p class="goal-desc">Reach 500 study points to unlock a park walk.</p>
-              <div class="goal-footer">
-                <div class="retro-progress-bar locked"></div>
+              <h3 class="goal-title">Study for 30mins</h3>
+              <p class="goal-desc">Spend 30 minutes in Cozy Cafe study sessions.</p>
+              <div class="goal-footer" id="goal-study-30mins-footer">
+                <div class="retro-progress-bar">
+                  <div class="retro-progress-fill" style="width: 0%;"></div>
+                </div>
                 <div class="goal-progress-container">
-                  <span>Locked</span>
-                  <span class="goal-reward">Reward: Rare Item</span>
+                  <span>0%</span>
+                  <span class="goal-reward">Reward: 15 Coins</span>
                 </div>
               </div>
             </article>
-          </div>
-        </section>
-        
-        <!-- EXPLORE MORE SECTION -->
-        <section aria-labelledby="explore-title">
-          <div class="section-header">
-            <h2 class="section-title" id="explore-title">Explore more</h2>
-          </div>
-          
-          <div class="explore-grid">
-            <!-- Study Guides -->
-            <div class="explore-card">
-              <div class="explore-icon-box">
-                <!-- Book SVG -->
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                </svg>
-              </div>
-              <div class="explore-info">
-                <h3 class="explore-title">Study Guides</h3>
-                <p class="explore-desc">Review your notes and prepare for the next level.</p>
-              </div>
-            </div>
             
-            <!-- Guild Hall -->
-            <div class="explore-card">
-              <div class="explore-icon-box">
-                <!-- Guild Users SVG -->
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
+            <!-- Goal 3: Finish one task -->
+            <article class="goal-card" id="goal-finish-task">
+              <div class="goal-header">
+                <span class="goal-tag tag-petcare">Task</span>
+                <span class="goal-icon" title="Finish Task Icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                    <polyline points="9 11 12 14 22 4"/>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                  </svg>
+                </span>
               </div>
-              <div class="explore-info">
-                <h3 class="explore-title">Guild Hall</h3>
-                <p class="explore-desc">Join fellow students in co-working sessions.</p>
+              <h3 class="goal-title">Finish one task</h3>
+              <p class="goal-desc">Complete at least one task on your checklist.</p>
+              <div class="goal-footer" id="goal-finish-task-footer">
+                <div class="retro-progress-bar">
+                  <div class="retro-progress-fill" style="width: 0%;"></div>
+                </div>
+                <div class="goal-progress-container">
+                  <span>0%</span>
+                  <span class="goal-reward">Reward: 20 Coins</span>
+                </div>
               </div>
-            </div>
+            </article>
           </div>
         </section>
         
@@ -244,9 +253,9 @@
         <section class="profile-card" aria-label="Pet Profile">
           <div class="profile-header">
             <div class="profile-avatar" id="main-profile-avatar-box">
-              <svg style="width: 100%; height: 100%; padding: 4px;"><use href="#char-avatar-0"></use></svg>
+              <svg viewBox="0 0 16 16" style="width: 100%; height: 100%; padding: 4px;"><use href="#char-avatar-0"></use></svg>
               <div class="pet-avatar-overlay" id="main-profile-pet-overlay">
-                <svg><use href="#pet-puppy"></use></svg>
+                <svg viewBox="0 0 16 16"><use href="#pet-puppy"></use></svg>
               </div>
             </div>
             <div class="profile-title-box">
@@ -358,10 +367,129 @@
           </div>
         </section>
         
+        <!-- STUDY RECORDS CARD -->
+        <section class="stats-record-card" aria-label="Study Records">
+          <div class="stats-record-header">
+            <span class="stats-record-title">Study Records</span>
+          </div>
+          <div class="stats-record-body">
+            <div class="record-item">
+              <span class="record-label">Total Study Time:</span>
+              <span class="record-value" id="record-total-study-time">0s</span>
+            </div>
+            <div class="record-item">
+              <span class="record-label">Tasks Accomplished:</span>
+              <span class="record-value" id="record-total-tasks">0 tasks</span>
+            </div>
+          </div>
+        </section>
+        
       </aside>
       
     </main>
-  </div>
+
+    <!-- MY PET PAGE (shown when My Pet tab is active) -->
+    <section class="mypet-page" id="mypet-page" aria-label="My Pet Room">
+      <div class="mypet-layout">
+
+        <!-- Left: Pet Room Canvas -->
+        <div class="mypet-room-wrap">
+          <div class="mypet-room-title">
+            <span id="mypet-room-label">🏠 Pet Room</span>
+          </div>
+          <div class="mypet-room" id="mypet-room">
+            <!-- Room background is rendered as a single image (pet_room.png) in CSS -->
+
+            <!-- The pet (SVG, wanders via JS) -->
+            <div class="mypet-pet-sprite" id="mypet-pet-sprite">
+              <!-- Speech bubble above pet, nested inside sprite container to follow head -->
+              <div class="mypet-speech" id="mypet-speech">
+                <span id="mypet-speech-text">Let's play!</span>
+              </div>
+              <svg id="mypet-pet-svg" viewBox="0 0 16 16" width="48" height="48"></svg>
+              <div class="mypet-pet-shadow"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Pet Info Panel -->
+        <aside class="mypet-info-panel">
+
+          <!-- Pet avatar + name -->
+          <div class="mypet-info-card mypet-hero-card">
+            <div class="mypet-avatar-box" id="mypet-avatar-box">
+              <svg viewBox="0 0 16 16" width="72" height="72" id="mypet-avatar-svg"></svg>
+            </div>
+            <div class="mypet-name-box">
+              <span class="mypet-name" id="mypet-name-label">Companion</span>
+              <span class="mypet-level" id="mypet-level-label">Level 1</span>
+              <span class="mypet-mood" id="mypet-mood-label">😊 Happy</span>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="mypet-info-card">
+            <div class="mypet-stat-row">
+              <span class="mypet-stat-icon">🍖</span>
+              <div class="mypet-stat-col">
+                <div class="mypet-stat-label-row">
+                  <span class="mypet-stat-name">Hunger</span>
+                  <span class="mypet-stat-pct" id="mypet-hunger-pct">100%</span>
+                </div>
+                <div class="mypet-stat-bar-track">
+                  <div class="mypet-stat-bar-fill mypet-bar-hunger" id="mypet-hunger-bar" style="width:100%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="mypet-stat-row">
+              <span class="mypet-stat-icon">❤️</span>
+              <div class="mypet-stat-col">
+                <div class="mypet-stat-label-row">
+                  <span class="mypet-stat-name">Health</span>
+                  <span class="mypet-stat-pct" id="mypet-health-pct">100%</span>
+                </div>
+                <div class="mypet-stat-bar-track">
+                  <div class="mypet-stat-bar-fill mypet-bar-health" id="mypet-health-bar" style="width:100%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Feed -->
+          <div class="mypet-info-card">
+            <h3 class="mypet-card-title">Feed your pet</h3>
+            <div class="mypet-feed-grid">
+              <button class="mypet-feed-btn" id="mypet-feed-snack">
+                <span class="mypet-feed-icon">🍪</span>
+                <span class="mypet-feed-label">Snack</span>
+                <span class="mypet-feed-cost">5 🪙</span>
+              </button>
+              <button class="mypet-feed-btn" id="mypet-feed-meal">
+                <span class="mypet-feed-icon">🍖</span>
+                <span class="mypet-feed-label">Meal</span>
+                <span class="mypet-feed-cost">15 🪙</span>
+              </button>
+              <button class="mypet-feed-btn" id="mypet-feed-treat">
+                <span class="mypet-feed-icon">🎂</span>
+                <span class="mypet-feed-label">Treat</span>
+                <span class="mypet-feed-cost">25 🪙</span>
+              </button>
+            </div>
+            <p class="mypet-feed-msg" id="mypet-feed-msg"></p>
+          </div>
+
+          <!-- Revive button (hidden unless pet is dead) -->
+          <div class="mypet-info-card" id="mypet-revive-card" style="display:none">
+            <h3 class="mypet-card-title" style="color:#DC3545">⚠️ Pet fainted!</h3>
+            <p style="font-size:13px;margin-bottom:8px;">Your pet needs help. Revive it to keep playing together!</p>
+            <button class="retro-btn btn-green" id="mypet-revive-btn" style="width:100%">Revive (50 🪙)</button>
+          </div>
+
+        </aside>
+      </div>
+    </section>
+
+  </div><!-- /container -->
 
   <!-- ONBOARDING OVERLAY -->
   <div class="onboarding-overlay" id="onboarding-overlay">
@@ -499,100 +627,219 @@
 
       <!-- PET 0: Puppy -->
       <symbol id="pet-puppy" viewBox="0 0 16 16">
-        <!-- floppy ears -->
         <rect x="2" y="3" width="2" height="6" fill="#78350F"/>
         <rect x="12" y="3" width="2" height="6" fill="#78350F"/>
-        <!-- head -->
         <rect x="4" y="2" width="8" height="9" fill="#D97706"/>
         <rect x="3" y="4" width="10" height="6" fill="#D97706"/>
-        <!-- snout/muzzle -->
         <rect x="6" y="7" width="4" height="4" fill="#FFFBEB"/>
-        <!-- nose -->
         <rect x="7" y="7" width="2" height="2" fill="#1E293B"/>
-        <!-- eyes -->
         <rect x="5" y="5" width="1" height="2" fill="#1E293B"/>
         <rect x="10" y="5" width="1" height="2" fill="#1E293B"/>
-        <!-- tongue -->
         <rect x="7.5" y="9" width="1" height="2" fill="#F43F5E"/>
+        <!-- Body and legs for front view -->
+        <rect x="4" y="11" width="8" height="3" fill="#D97706"/>
+        <rect x="6" y="11" width="4" height="3" fill="#FFFBEB"/>
+        <rect x="4" y="14" width="2" height="2" fill="#78350F"/>
+        <rect x="10" y="14" width="2" height="2" fill="#78350F"/>
+      </symbol>
+      <symbol id="pet-puppy-back" viewBox="0 0 16 16">
+        <rect x="2" y="3" width="2" height="6" fill="#78350F"/>
+        <rect x="12" y="3" width="2" height="6" fill="#78350F"/>
+        <rect x="4" y="2" width="8" height="9" fill="#D97706"/>
+        <rect x="3" y="4" width="10" height="6" fill="#D97706"/>
+        <rect x="7" y="10" width="2" height="2" fill="#78350F"/>
+      </symbol>
+      <symbol id="pet-puppy-side" viewBox="0 0 16 16">
+        <rect x="3" y="12" width="1" height="2" fill="#78350F"/>
+        <rect x="9" y="12" width="1" height="2" fill="#78350F"/>
+        <rect x="1" y="5" width="1" height="3" fill="#78350F"/>
+        <rect x="2" y="6" width="1" height="2" fill="#D97706"/>
+        <rect x="3" y="7" width="8" height="5" fill="#D97706"/>
+        <rect x="4" y="12" width="2" height="3" fill="#D97706"/>
+        <rect x="10" y="12" width="2" height="3" fill="#D97706"/>
+        <rect x="4" y="14" width="2" height="1" fill="#78350F"/>
+        <rect x="10" y="14" width="2" height="1" fill="#78350F"/>
+        <rect x="8" y="7" width="4" height="2" fill="#D97706"/>
+        <rect x="9" y="3" width="5" height="5" fill="#D97706"/>
+        <rect x="8" y="4" width="2" height="5" fill="#78350F"/>
+        <rect x="13" y="5" width="2" height="2" fill="#FFFBEB"/>
+        <rect x="14" y="5" width="1" height="1" fill="#78350F"/>
+        <rect x="11" y="4" width="1" height="1" fill="#1E293B"/>
+        <rect x="5" y="11" width="4" height="1" fill="#FFFBEB"/>
       </symbol>
 
       <!-- PET 1: Kitty -->
       <symbol id="pet-kitty" viewBox="0 0 16 16">
-        <!-- pointy ears -->
         <rect x="3" y="2" width="2" height="2" fill="#D97706"/>
         <rect x="11" y="2" width="2" height="2" fill="#D97706"/>
         <rect x="4" y="3" width="1" height="1" fill="#FDA4AF"/>
         <rect x="11" y="3" width="1" height="1" fill="#FDA4AF"/>
-        <!-- head -->
         <rect x="3" y="4" width="10" height="7" fill="#F59E0B"/>
         <rect x="4" y="5" width="8" height="6" fill="#F59E0B"/>
-        <!-- eyes -->
         <rect x="5" y="6" width="1" height="2" fill="#1E293B"/>
         <rect x="10" y="6" width="1" height="2" fill="#1E293B"/>
         <rect x="5" y="6" width="1" height="1" fill="#A7F3D0"/>
         <rect x="10" y="6" width="1" height="1" fill="#A7F3D0"/>
-        <!-- nose -->
         <rect x="7.5" y="8.5" width="1" height="1" fill="#FDA4AF"/>
-        <!-- whiskers -->
         <line x1="2" y1="8" x2="5" y2="8" stroke="#FFFBEB" stroke-width="1"/>
         <line x1="11" y1="8" x2="14" y2="8" stroke="#FFFBEB" stroke-width="1"/>
+        <!-- Body and legs for front view -->
+        <rect x="4" y="11" width="8" height="3" fill="#F59E0B"/>
+        <rect x="6" y="11" width="4" height="3" fill="#FFFBEB"/>
+        <rect x="4" y="14" width="2" height="2" fill="#D97706"/>
+        <rect x="10" y="14" width="2" height="2" fill="#D97706"/>
+      </symbol>
+      <symbol id="pet-kitty-back" viewBox="0 0 16 16">
+        <rect x="3" y="2" width="2" height="2" fill="#D97706"/>
+        <rect x="11" y="2" width="2" height="2" fill="#D97706"/>
+        <rect x="3" y="4" width="10" height="7" fill="#F59E0B"/>
+        <rect x="7" y="10" width="2" height="5" fill="#D97706"/>
+      </symbol>
+      <symbol id="pet-kitty-side" viewBox="0 0 16 16">
+        <rect x="1" y="3" width="1" height="4" fill="#78350F"/>
+        <rect x="2" y="3" width="1" height="1" fill="#78350F"/>
+        <rect x="2" y="4" width="1" height="3" fill="#F59E0B"/>
+        <rect x="3" y="6" width="1" height="2" fill="#F59E0B"/>
+        <rect x="3" y="12" width="1" height="2" fill="#D97706"/>
+        <rect x="9" y="12" width="1" height="2" fill="#D97706"/>
+        <rect x="3" y="7" width="8" height="5" fill="#F59E0B"/>
+        <rect x="4" y="12" width="2" height="3" fill="#F59E0B"/>
+        <rect x="10" y="12" width="2" height="3" fill="#F59E0B"/>
+        <rect x="4" y="14" width="2" height="1" fill="#78350F"/>
+        <rect x="10" y="14" width="2" height="1" fill="#78350F"/>
+        <rect x="5" y="8" width="1" height="3" fill="#D97706"/>
+        <rect x="7" y="8" width="1" height="3" fill="#D97706"/>
+        <rect x="9" y="4" width="5" height="4" fill="#F59E0B"/>
+        <rect x="9" y="2" width="1" height="2" fill="#F59E0B"/>
+        <rect x="12" y="2" width="1" height="2" fill="#F59E0B"/>
+        <rect x="10" y="3" width="1" height="1" fill="#FDA4AF"/>
+        <rect x="13" y="3" width="1" height="1" fill="#FDA4AF"/>
+        <rect x="12" y="5" width="1" height="1" fill="#10B981"/>
+        <rect x="14" y="6" width="1" height="1" fill="#FDA4AF"/>
+        <rect x="9" y="8" width="2" height="3" fill="#FFFBEB"/>
       </symbol>
 
       <!-- PET 2: Bunny -->
       <symbol id="pet-bunny" viewBox="0 0 16 16">
-        <!-- long ears -->
         <rect x="4" y="1" width="2" height="5" fill="#F1F5F9"/>
         <rect x="10" y="1" width="2" height="5" fill="#F1F5F9"/>
         <rect x="4.5" y="2" width="1" height="3" fill="#FECDD3"/>
         <rect x="10.5" y="2" width="1" height="3" fill="#FECDD3"/>
-        <!-- head -->
         <rect x="3" y="5" width="10" height="7" fill="#F8FAFC"/>
         <rect x="4" y="6" width="8" height="6" fill="#F8FAFC"/>
-        <!-- eyes -->
         <rect x="5" y="7" width="1" height="2" fill="#1E293B"/>
         <rect x="10" y="7" width="1" height="2" fill="#1E293B"/>
-        <!-- nose/mouth -->
         <rect x="7.5" y="9" width="1" height="1" fill="#FDA4AF"/>
         <rect x="7" y="10" width="2" height="1" fill="#E2E8F0"/>
+        <!-- Body and legs for front view -->
+        <rect x="4" y="12" width="8" height="2" fill="#F8FAFC"/>
+        <rect x="5" y="12" width="6" height="2" fill="#E2E8F0"/>
+        <rect x="4" y="14" width="2" height="2" fill="#CBD5E1"/>
+        <rect x="10" y="14" width="2" height="2" fill="#CBD5E1"/>
+      </symbol>
+      <symbol id="pet-bunny-back" viewBox="0 0 16 16">
+        <rect x="4" y="1" width="2" height="5" fill="#F1F5F9"/>
+        <rect x="10" y="1" width="2" height="5" fill="#F1F5F9"/>
+        <rect x="3" y="5" width="10" height="7" fill="#F8FAFC"/>
+        <rect x="7" y="10" width="2" height="2" fill="#E2E8F0"/>
+      </symbol>
+      <symbol id="pet-bunny-side" viewBox="0 0 16 16">
+        <rect x="7" y="1" width="2" height="5" fill="#475569"/>
+        <rect x="8" y="2" width="1" height="3" fill="#E2E8F0"/>
+        <rect x="10" y="0" width="2" height="6" fill="#1E293B"/>
+        <rect x="11" y="1" width="1" height="4" fill="#FDA4AF"/>
+        <rect x="2" y="6" width="9" height="6" fill="#1E293B"/>
+        <rect x="9" y="4" width="4" height="5" fill="#1E293B"/>
+        <rect x="0" y="7" width="3" height="3" fill="#1E293B"/>
+        <rect x="1" y="8" width="2" height="1" fill="#FFFFFF"/>
+        <rect x="3" y="7" width="7" height="4" fill="#FFFFFF"/>
+        <rect x="4" y="6" width="5" height="1" fill="#FFFFFF"/>
+        <rect x="10" y="5" width="2" height="3" fill="#FFFFFF"/>
+        <rect x="11" y="6" width="1" height="1" fill="#EF4444"/>
+        <rect x="13" y="7" width="1" height="1" fill="#FDA4AF"/>
+        <rect x="3" y="11" width="8" height="2" fill="#1E293B"/>
+        <rect x="4" y="11" width="2" height="1" fill="#FFFFFF"/>
+        <rect x="9" y="11" width="2" height="1" fill="#FFFFFF"/>
+        <rect x="3" y="10" width="7" height="1" fill="#E2E8F0"/>
+        <rect x="4" y="9" width="3" height="1" fill="#E2E8F0"/>
       </symbol>
 
       <!-- PET 3: Frog -->
       <symbol id="pet-frog" viewBox="0 0 16 16">
-        <!-- big eyes -->
         <circle cx="5" cy="4" r="2" fill="#10B981"/>
         <circle cx="11" cy="4" r="2" fill="#10B981"/>
         <circle cx="5" cy="4" r="1" fill="#F8FAFC"/>
         <circle cx="11" cy="4" r="1" fill="#F8FAFC"/>
         <circle cx="5" cy="4" r="0.5" fill="#0F172A"/>
         <circle cx="11" cy="4" r="0.5" fill="#0F172A"/>
-        <!-- head -->
         <rect x="3" y="5" width="10" height="7" fill="#10B981"/>
         <rect x="2" y="6" width="12" height="5" fill="#10B981"/>
-        <!-- rosy cheeks -->
         <rect x="3" y="8" width="1.5" height="1" fill="#FDA4AF" opacity="0.8"/>
         <rect x="11.5" y="8" width="1.5" height="1" fill="#FDA4AF" opacity="0.8"/>
-        <!-- mouth -->
         <path d="M5 8.5C5 9.5 7 10 8 10C9 10 11 9.5 11 8.5" stroke="#065F46" stroke-width="1" stroke-linecap="round" fill="none"/>
+        <!-- Body and legs for front view -->
+        <rect x="5" y="12" width="6" height="2" fill="#10B981"/>
+        <rect x="6" y="12" width="4" height="2" fill="#FEF08A"/>
+        <rect x="4" y="14" width="2" height="2" fill="#065F46"/>
+        <rect x="10" y="14" width="2" height="2" fill="#065F46"/>
+      </symbol>
+      <symbol id="pet-frog-back" viewBox="0 0 16 16">
+        <rect x="3" y="5" width="10" height="7" fill="#10B981"/>
+        <rect x="2" y="6" width="12" height="5" fill="#10B981"/>
+      </symbol>
+      <symbol id="pet-frog-side" viewBox="0 0 16 16">
+        <rect x="7" y="1" width="3" height="2" fill="#F59E0B"/>
+        <rect x="8" y="0" width="1" height="3" fill="#D97706"/>
+        <rect x="3" y="4" width="8" height="9" fill="#065F46"/>
+        <rect x="2" y="9" width="4" height="4" fill="#065F46"/>
+        <rect x="4" y="5" width="6" height="7" fill="#10B981"/>
+        <rect x="4" y="4" width="4" height="1" fill="#10B981"/>
+        <rect x="7" y="7" width="3" height="5" fill="#FEF08A"/>
+        <rect x="6" y="8" width="1" height="3" fill="#FEF08A"/>
+        <rect x="8" y="3" width="2" height="2" fill="#065F46"/>
+        <rect x="8" y="4" width="2" height="1" fill="#FFFFFF"/>
+        <rect x="9" y="4" width="1" height="1" fill="#1E293B"/>
+        <rect x="3" y="9" width="3" height="3" fill="#059669"/>
+        <rect x="2" y="11" width="3" height="1" fill="#065F46"/>
+        <rect x="8" y="12" width="2" height="1" fill="#065F46"/>
+        <rect x="5" y="12" width="2" height="1" fill="#065F46"/>
+        <rect x="10" y="6" width="1" height="1" fill="#FCA5A5"/>
       </symbol>
 
       <!-- PET 4: Owl -->
       <symbol id="pet-owl" viewBox="0 0 16 16">
-        <!-- horns/feathers -->
         <polygon points="3,2 5,4 3,4" fill="#78350F"/>
         <polygon points="13,2 11,4 13,4" fill="#78350F"/>
-        <!-- head/body -->
         <rect x="3" y="3" width="10" height="10" fill="#92400E"/>
         <rect x="4" y="4" width="8" height="8" fill="#92400E"/>
-        <!-- big eyes outlines -->
         <circle cx="5.5" cy="6.5" r="2.5" fill="#FBBF24"/>
         <circle cx="10.5" cy="6.5" r="2.5" fill="#FBBF24"/>
         <circle cx="5.5" cy="6.5" r="1" fill="#0F172A"/>
         <circle cx="10.5" cy="6.5" r="1" fill="#0F172A"/>
-        <!-- beak -->
         <polygon points="8,7.5 7.5,9.5 8.5,9.5" fill="#D97706"/>
-        <!-- chest feathers -->
         <rect x="5" y="10" width="6" height="3" fill="#FFFBEB"/>
         <rect x="6" y="10.5" width="4" height="2" fill="#D97706" opacity="0.3"/>
+        <!-- Feet for owl -->
+        <rect x="5" y="13" width="2" height="2" fill="#D97706"/>
+        <rect x="9" y="13" width="2" height="2" fill="#D97706"/>
+      </symbol>
+      <symbol id="pet-owl-back" viewBox="0 0 16 16">
+        <rect x="3" y="3" width="10" height="10" fill="#92400E"/>
+        <rect x="4" y="4" width="8" height="8" fill="#92400E"/>
+      </symbol>
+      <symbol id="pet-owl-side" viewBox="0 0 16 16">
+        <rect x="4" y="1" width="2" height="2" fill="#78350F"/>
+        <rect x="3" y="3" width="8" height="10" fill="#78350F"/>
+        <rect x="4" y="4" width="6" height="8" fill="#92400E"/>
+        <rect x="3" y="6" width="4" height="5" fill="#78350F"/>
+        <rect x="4" y="7" width="2" height="3" fill="#B45309"/>
+        <rect x="7" y="4" width="3" height="5" fill="#FFFBEB"/>
+        <rect x="7" y="5" width="2" height="2" fill="#FBBF24"/>
+        <rect x="8" y="6" width="1" height="1" fill="#0F172A"/>
+        <rect x="10" y="6" width="2" height="2" fill="#D97706"/>
+        <rect x="10" y="6" width="1" height="1" fill="#F59E0B"/>
+        <rect x="7" y="9" width="3" height="3" fill="#FFFBEB"/>
+        <rect x="8" y="10" width="1" height="1" fill="#92400E" opacity="0.4"/>
       </symbol>
     </svg>
 
@@ -688,7 +935,7 @@
         <!-- Puppy -->
         <div class="pet-select-card active" data-pet-idx="0">
           <div class="pet-select-icon-box">
-            <svg><use href="#pet-puppy"></use></svg>
+            <svg viewBox="0 0 16 16"><use href="#pet-puppy"></use></svg>
           </div>
           <span class="pet-select-name">Puppy</span>
           <span class="pet-select-desc">Loyal and energetic, loves Pomodoros!</span>
@@ -696,7 +943,7 @@
         <!-- Kitty -->
         <div class="pet-select-card" data-pet-idx="1">
           <div class="pet-select-icon-box">
-            <svg><use href="#pet-kitty"></use></svg>
+            <svg viewBox="0 0 16 16"><use href="#pet-kitty"></use></svg>
           </div>
           <span class="pet-select-name">Kitty</span>
           <span class="pet-select-desc">Purrs softly to help you read and write.</span>
@@ -704,7 +951,7 @@
         <!-- Bunny -->
         <div class="pet-select-card" data-pet-idx="2">
           <div class="pet-select-icon-box">
-            <svg><use href="#pet-bunny"></use></svg>
+            <svg viewBox="0 0 16 16"><use href="#pet-bunny"></use></svg>
           </div>
           <span class="pet-select-name">Bunny</span>
           <span class="pet-select-desc">Quiet and cozy, perfect for study guides.</span>
@@ -712,7 +959,7 @@
         <!-- Frog -->
         <div class="pet-select-card" data-pet-idx="3">
           <div class="pet-select-icon-box">
-            <svg><use href="#pet-frog"></use></svg>
+            <svg viewBox="0 0 16 16"><use href="#pet-frog"></use></svg>
           </div>
           <span class="pet-select-name">Frog</span>
           <span class="pet-select-desc">Leaps forward in focus, loves green tea.</span>
@@ -720,7 +967,7 @@
         <!-- Owl -->
         <div class="pet-select-card" data-pet-idx="4">
           <div class="pet-select-icon-box">
-            <svg><use href="#pet-owl"></use></svg>
+            <svg viewBox="0 0 16 16"><use href="#pet-owl"></use></svg>
           </div>
           <span class="pet-select-name">Owl</span>
           <span class="pet-select-desc">Wise and silent, keeps streaks alive!</span>
@@ -768,11 +1015,11 @@
 
       <div class="welcome-avatars-box">
         <div class="welcome-avatar-wrapper" id="welcome-avatar-char">
-          <svg><use href="#char-avatar-0"></use></svg>
+          <svg viewBox="0 0 16 16"><use href="#char-avatar-0"></use></svg>
         </div>
         <div style="font-size: 24px; color: var(--color-brown); font-weight: bold; margin: 0 var(--spacing-sm);">+</div>
         <div class="welcome-avatar-wrapper" id="welcome-avatar-pet">
-          <svg><use href="#pet-puppy"></use></svg>
+          <svg viewBox="0 0 16 16"><use href="#pet-puppy"></use></svg>
         </div>
       </div>
 
@@ -805,21 +1052,21 @@
         <div class="form-group">
           <label class="form-label">Character Look</label>
           <div class="customizer-options-grid" id="modal-avatar-options-grid" style="grid-template-columns: repeat(5, 1fr); margin-top: 4px; gap: 8px;">
-            <div class="customizer-option-card" data-avatar-idx="0"><svg><use href="#char-avatar-0"></use></svg></div>
-            <div class="customizer-option-card" data-avatar-idx="1"><svg><use href="#char-avatar-1"></use></svg></div>
-            <div class="customizer-option-card" data-avatar-idx="2"><svg><use href="#char-avatar-2"></use></svg></div>
-            <div class="customizer-option-card" data-avatar-idx="3"><svg><use href="#char-avatar-3"></use></svg></div>
-            <div class="customizer-option-card" data-avatar-idx="4"><svg><use href="#char-avatar-4"></use></svg></div>
+            <div class="customizer-option-card" data-avatar-idx="0"><svg viewBox="0 0 16 16"><use href="#char-avatar-0"></use></svg></div>
+            <div class="customizer-option-card" data-avatar-idx="1"><svg viewBox="0 0 16 16"><use href="#char-avatar-1"></use></svg></div>
+            <div class="customizer-option-card" data-avatar-idx="2"><svg viewBox="0 0 16 16"><use href="#char-avatar-2"></use></svg></div>
+            <div class="customizer-option-card" data-avatar-idx="3"><svg viewBox="0 0 16 16"><use href="#char-avatar-3"></use></svg></div>
+            <div class="customizer-option-card" data-avatar-idx="4"><svg viewBox="0 0 16 16"><use href="#char-avatar-4"></use></svg></div>
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">Study Pet</label>
           <div class="customizer-options-grid" id="modal-pet-options-grid" style="grid-template-columns: repeat(5, 1fr); margin-top: 4px; gap: 8px;">
-            <div class="customizer-option-card" data-pet-idx="0"><svg><use href="#pet-puppy"></use></svg></div>
-            <div class="customizer-option-card" data-pet-idx="1"><svg><use href="#pet-kitty"></use></svg></div>
-            <div class="customizer-option-card" data-pet-idx="2"><svg><use href="#pet-bunny"></use></svg></div>
-            <div class="customizer-option-card" data-pet-idx="3"><svg><use href="#pet-frog"></use></svg></div>
-            <div class="customizer-option-card" data-pet-idx="4"><svg><use href="#pet-owl"></use></svg></div>
+            <div class="customizer-option-card" data-pet-idx="0"><svg viewBox="0 0 16 16"><use href="#pet-puppy"></use></svg></div>
+            <div class="customizer-option-card" data-pet-idx="1"><svg viewBox="0 0 16 16"><use href="#pet-kitty"></use></svg></div>
+            <div class="customizer-option-card" data-pet-idx="2"><svg viewBox="0 0 16 16"><use href="#pet-bunny"></use></svg></div>
+            <div class="customizer-option-card" data-pet-idx="3"><svg viewBox="0 0 16 16"><use href="#pet-frog"></use></svg></div>
+            <div class="customizer-option-card" data-pet-idx="4"><svg viewBox="0 0 16 16"><use href="#pet-owl"></use></svg></div>
           </div>
         </div>
         <button type="submit" class="onboarding-btn-primary" style="margin-top: 10px; width: 100%;" id="profile-save-btn">Save changes</button>

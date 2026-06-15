@@ -108,9 +108,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Update Pet Health/Hunger progress bars
   function updatePetStatsUI() {
-    if (petHungerText) petHungerText.textContent = `${state.petHunger}%`;
+    if (petHungerText) petHungerText.textContent = `${Math.round(state.petHunger)}%`;
     if (petHungerFill) petHungerFill.style.width = `${state.petHunger}%`;
-    if (petHealthText) petHealthText.textContent = `${state.petHealth}%`;
+    if (petHealthText) petHealthText.textContent = `${Math.round(state.petHealth)}%`;
     if (petHealthFill) petHealthFill.style.width = `${state.petHealth}%`;
 
     // Dead / Alive class toggle
@@ -159,25 +159,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (charIsSitting) {
       const tId = parseInt(currentTableId);
-      if (tId === 1) {
-        if (charY < 200) {
+      if (tId === 10) {
+        // Bench 1 (Left vertical) - face right
+        suffix = "-side";
+        scaleX = 1;
+      } else if (tId === 11 || tId === 12) {
+        // Bench 2 & 3 (Top horizontal) - face front
+        suffix = "";
+        scaleX = 1;
+      } else if (tId === 13) {
+        // Bench 4 (Right vertical) - face left
+        suffix = "-side";
+        scaleX = -1;
+      } else if (tId === 14) {
+        // Picnic Table Left - face right
+        suffix = "-side";
+        scaleX = 1;
+      } else if (tId === 15) {
+        // Picnic Table Right - face left
+        suffix = "-side";
+        scaleX = -1;
+      } else if (tId === 1) {
+        if (charY < 180) {
           suffix = ""; // top chairs face front (downwards)
         } else {
           suffix = "-back"; // bottom chairs face back (upwards)
         }
-      } else if (tId === 2 || tId === 3) {
+      } else if (tId === 2) {
+        if (charY < 370) {
+          suffix = ""; // top chairs face front (downwards)
+        } else {
+          suffix = "-back"; // bottom chairs face back (upwards)
+        }
+      } else if (tId === 3 || tId === 5) {
         suffix = "-side";
-        const tableMidX = tId === 2 ? 390 : 550;
-        if (charX < tableMidX) {
+        if (charX < 680) {
           scaleX = 1; // Left seat faces right towards the table
         } else {
           scaleX = -1; // Right seat faces left towards the table
         }
       } else if (tId === 4) {
-        if (charY < 250) {
-          suffix = ""; // top chair faces front (downwards)
+        suffix = "-side";
+        if (charX < 600) {
+          scaleX = 1; // Left seat faces right towards the table
         } else {
-          suffix = "-back"; // bottom chair faces back (upwards)
+          scaleX = -1; // Right seat faces left towards the table
         }
       }
     } else if (dx !== 0 || dy !== 0) {
@@ -273,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       showSpeechBubble('char-speech', "Wow, look at all this green grass! 🌳");
       setTimeout(() => {
-        showSpeechBubble('pet-speech', "Woof woof! Let's play!");
+        showSpeechBubble('pet-speech', "Let's play! 🐾");
       }, 1500);
 
       // Phaser sync
@@ -332,6 +358,11 @@ document.addEventListener('DOMContentLoaded', () => {
     charSprite.style.top = `${charY}px`;
     petSprite.style.left = `${petX}px`;
     petSprite.style.top = `${petY}px`;
+
+    charTargetX = charX;
+    charTargetY = charY;
+    petTargetX = petX;
+    petTargetY = petY;
   }
 
   // --- SEAT DETECTION & SNAP MECHANISM ---
@@ -378,7 +409,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateCharacterDirection(0, 0);
 
-    showSpeechBubble('char-speech', "Comfy! Let's choose what tool to study with in the status list.");
+    if (currentRoom === 'park') {
+      activeTool = 'rest';
+      if (statusSelect) {
+        statusSelect.value = 'rest';
+      }
+      startStudyTimer();
+      showSpeechBubble('char-speech', "Ah, sitting on the park bench. Time to relax! 🌳");
+    } else {
+      showSpeechBubble('char-speech', "Comfy! Let's choose what tool to study with in the status list.");
+    }
   }
 
   function standUp() {
@@ -575,6 +615,12 @@ document.addEventListener('DOMContentLoaded', () => {
     studyTimer = setInterval(() => {
       studySeconds++;
       
+      if (activeTool !== 'rest') {
+        state.addStudySecond();
+      } else {
+        state.addRestSecond();
+      }
+      
       // Update timer clock UI
       const hrs = Math.floor(studySeconds / 3600).toString().padStart(2, '0');
       const mins = Math.floor((studySeconds % 3600) / 60).toString().padStart(2, '0');
@@ -642,10 +688,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(() => {
       if (state.petIsDead) return;
 
-      // If user is focused study, decay is cut in half!
-      let hungerDecay = 3;
+      // Slower, realistic decay rates:
+      // Standard: 8% per hour = 8 / 240 per 15s check
+      // Focus: 4% per hour = 4 / 240 per 15s check
+      let hungerDecay = 8 / 240;
       if (studyTimerActive && activeTool !== 'rest') {
-        hungerDecay = 1; // Focus keeps pet energised!
+        hungerDecay = 4 / 240; // Focus keeps pet energised!
       }
       
       state.decayPetStats(hungerDecay, 0);
@@ -653,7 +701,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Show warnings if hungry
       if (state.petHunger < 30 && !state.petIsDead && Math.random() > 0.4) {
-        showSpeechBubble('pet-speech', "Squeak! I'm hungry... 🦴");
+        showSpeechBubble('pet-speech', "I'm hungry... 🍽️");
       }
     }, 15000);
   }
@@ -738,6 +786,72 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- ACTIVE TASKS CHECKLIST LOGIC ---
+  const fadingTasks = new Set();
+  const activeTimeouts = new Map();
+
+  function renderLoungeTasks() {
+    if (!taskListItems) return;
+    taskListItems.innerHTML = '';
+    
+    const tasks = state.customTasks || [];
+    tasks.forEach(task => {
+      const li = document.createElement('li');
+      li.className = `task-list-item ${task.completed ? 'task-completed' : ''}`;
+      li.innerHTML = `
+        <input type="checkbox" class="task-checkbox" data-task-id="${task.id}" ${task.completed ? 'checked' : ''}>
+        <span class="task-text-label">${escapeHtml(task.text)}</span>
+        <button class="task-delete-btn" data-task-id="${task.id}">&times;</button>
+      `;
+      
+      const checkbox = li.querySelector('.task-checkbox');
+      checkbox.addEventListener('change', () => {
+        if (checkbox.checked) {
+          li.classList.add('task-completed');
+          state.completeTask(task.id);
+        } else {
+          li.classList.remove('task-completed');
+          state.toggleTask(task.id);
+        }
+      });
+      
+      // Auto-delete fadeout animation handling for completed tasks
+      if (task.completed) {
+        if (!fadingTasks.has(task.id)) {
+          fadingTasks.add(task.id);
+          const timeoutId = setTimeout(() => {
+            li.style.transition = 'opacity 0.5s ease';
+            li.style.opacity = '0';
+            const deleteTimeoutId = setTimeout(() => {
+              state.deleteTask(task.id);
+              fadingTasks.delete(task.id);
+              activeTimeouts.delete(task.id);
+              activeTimeouts.delete(task.id + '_delete');
+            }, 500);
+            activeTimeouts.set(task.id + '_delete', deleteTimeoutId);
+          }, 2000);
+          activeTimeouts.set(task.id, timeoutId);
+        } else if (activeTimeouts.has(task.id + '_delete')) {
+          li.style.opacity = '0';
+        }
+      } else {
+        if (fadingTasks.has(task.id)) {
+          clearTimeout(activeTimeouts.get(task.id));
+          clearTimeout(activeTimeouts.get(task.id + '_delete'));
+          fadingTasks.delete(task.id);
+          activeTimeouts.delete(task.id);
+          activeTimeouts.delete(task.id + '_delete');
+        }
+      }
+      
+      const deleteBtn = li.querySelector('.task-delete-btn');
+      deleteBtn.addEventListener('click', () => {
+        state.deleteTask(task.id);
+      });
+      
+      taskListItems.appendChild(li);
+    });
+  }
+
   if (taskAddBtn && taskInput) {
     // Add task keypress listener
     taskInput.addEventListener('keypress', (e) => {
@@ -750,51 +864,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const text = taskInput.value.trim();
       if (!text) return;
 
-      const taskId = `task-${Date.now()}`;
-      const li = document.createElement('li');
-      li.className = 'task-list-item';
-      li.innerHTML = `
-        <input type="checkbox" class="task-checkbox" data-task-id="${taskId}">
-        <span class="task-text-label">${escapeHtml(text)}</span>
-        <button class="task-delete-btn" data-task-id="${taskId}">&times;</button>
-      `;
-
-      taskListItems.appendChild(li);
+      state.addTask(text);
       taskInput.value = '';
-
-      // Bind dynamic listeners
-      bindTaskEvents(li);
       showSpeechBubble('char-speech', "Added a new study focus goal! 📝");
-    });
-  }
-
-  // Bind complete and delete events to task items
-  function bindTaskEvents(itemEl) {
-    const checkbox = itemEl.querySelector('.task-checkbox');
-    const deleteBtn = itemEl.querySelector('.task-delete-btn');
-
-    checkbox.addEventListener('change', () => {
-      if (checkbox.checked) {
-        itemEl.classList.add('task-completed');
-        // Reward 15 coins on goal completion
-        state.addCoins(15);
-        state.addXp(10);
-        showSpeechBubble('char-speech', "Awesome! Task complete! Earned 15 coins & 10 XP! 💰🎉");
-        triggerPetHearts();
-
-        // fade out auto delete after 2.5s
-        setTimeout(() => {
-          itemEl.style.opacity = '0';
-          itemEl.style.transition = 'opacity 0.4s ease';
-          setTimeout(() => itemEl.remove(), 400);
-        }, 2500);
-      } else {
-        itemEl.classList.remove('task-completed');
-      }
-    });
-
-    deleteBtn.addEventListener('click', () => {
-      itemEl.remove();
     });
   }
 
@@ -808,9 +880,21 @@ document.addEventListener('DOMContentLoaded', () => {
          .replace(/'/g, "&#039;");
   }
 
-  // Bind starting task items
-  const startingItems = document.querySelectorAll('.task-list-item');
-  startingItems.forEach(item => bindTaskEvents(item));
+  // Listen to tasks state changes and sync
+  state.on('tasksChange', () => {
+    renderLoungeTasks();
+  });
+
+  state.on('taskCompletedEffect', () => {
+    triggerPetHearts();
+  });
+
+  state.on('stateLoaded', () => {
+    renderLoungeTasks();
+  });
+
+  // Initial render of lounge tasks
+  renderLoungeTasks();
 
   // --- REDIRECTIONS ---
   if (backToHomeBtn) {
@@ -918,22 +1002,46 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    let isMoving = false;
+    let isKeyboardMoving = false;
 
     if (cursors.left.isDown || this.input.keyboard.addKey('A').isDown) {
       player.setVelocityX(-160);
-      isMoving = true;
+      isKeyboardMoving = true;
     } else if (cursors.right.isDown || this.input.keyboard.addKey('D').isDown) {
       player.setVelocityX(160);
-      isMoving = true;
+      isKeyboardMoving = true;
     }
 
     if (cursors.up.isDown || this.input.keyboard.addKey('W').isDown) {
       player.setVelocityY(-160);
-      isMoving = true;
+      isKeyboardMoving = true;
     } else if (cursors.down.isDown || this.input.keyboard.addKey('S').isDown) {
       player.setVelocityY(160);
-      isMoving = true;
+      isKeyboardMoving = true;
+    }
+
+    let isMoving = isKeyboardMoving;
+
+    // Click-to-move logic (runs if keyboard not moving)
+    if (!isKeyboardMoving) {
+      const targetPx = charTargetX + 22;
+      const targetPy = charTargetY + 42;
+      const dx = targetPx - player.x;
+      const dy = targetPy - player.y;
+      const dist = Math.hypot(dx, dy);
+
+      if (dist > 5) {
+        isMoving = true;
+        const speed = 160;
+        player.setVelocityX((dx / dist) * speed);
+        player.setVelocityY((dy / dist) * speed);
+      } else {
+        player.setVelocity(0);
+      }
+    } else {
+      // Keyboard input overrides and resets target to current position
+      charTargetX = player.x - 22;
+      charTargetY = player.y - 42;
     }
 
     // Sync DOM character sprite to Phaser physics body
@@ -942,22 +1050,62 @@ document.addEventListener('DOMContentLoaded', () => {
     charSprite.style.left = charX + 'px';
     charSprite.style.top = charY + 'px';
 
-    // Sync pet loosely
-    if (Math.abs(petX - charX) > 40 || Math.abs(petY - charY) > 40) {
-        petX += (charX - petX) * 0.05;
-        petY += (charY - petY) * 0.05;
-        petSprite.style.left = petX + 'px';
-        petSprite.style.top = petY + 'px';
+    if (isMoving) {
+      charSprite.classList.add('sprite-walking');
+      updateCharacterDirection(player.body.velocity.x, player.body.velocity.y);
+      if (charIsSitting) standUp();
+    } else {
+      charSprite.classList.remove('sprite-walking');
+      if (!charIsSitting) {
+        checkSeatSnap();
+      }
     }
 
-    if (isMoving) {
-        updateCharacterDirection(player.body.velocity.x, player.body.velocity.y);
-        updatePetDirection(charX - petX, charY - petY);
-        if (charIsSitting) standUp();
-    } else {
-        if (!charIsSitting) {
-            checkSeatSnap();
+    // Move pet to target (follows character or wanders)
+    if (!state.petIsDead) {
+      const distToOwner = Math.hypot(charX - petX, charY - petY);
+      let targetX = petTargetX;
+      let targetY = petTargetY;
+
+      // If owner is moving or is far away in Cafe, force follow
+      const playerIsMoving = isMoving || (player && (player.body.velocity.x !== 0 || player.body.velocity.y !== 0));
+      if (playerIsMoving || (currentRoom === 'cafe' && distToOwner > 100)) {
+        targetX = charX + (currentRoom === 'cafe' ? 30 : 20);
+        targetY = charY + 20;
+        // update petTargetX/Y so the next wander step starts near owner
+        petTargetX = targetX;
+        petTargetY = targetY;
+      }
+
+      const dx = targetX - petX;
+      const dy = targetY - petY;
+      const distToTarget = Math.hypot(dx, dy);
+
+      if (distToTarget > 5) {
+        petIsWalking = true;
+        petSprite.classList.add('sprite-walking');
+
+        // Move pet smoothly
+        const speed = petSpeed;
+        if (distToTarget <= speed) {
+          petX = targetX;
+          petY = targetY;
+        } else {
+          petX += (dx / distToTarget) * speed;
+          petY += (dy / distToTarget) * speed;
         }
+
+        petSprite.style.left = `${petX}px`;
+        petSprite.style.top = `${petY}px`;
+        updatePetDirection(dx, dy);
+      } else {
+        if (petIsWalking) {
+          petIsWalking = false;
+          petSprite.classList.remove('sprite-walking');
+        }
+      }
+    } else {
+      petSprite.classList.remove('sprite-walking');
     }
 
     // Scroll the DOM elements container in sync with the Phaser camera!

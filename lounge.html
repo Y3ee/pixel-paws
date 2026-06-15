@@ -138,13 +138,21 @@
                 <div class="viewport-exit-door" id="park-entry-door" style="top: 930px; left: 160px; width: 150px; height: 80px; background: rgba(78, 34, 15, 0.4); opacity: 0.85; border: 2px dashed #4E220F;">
                   <div class="door-frame" style="writing-mode: horizontal-tb; font-size: 11px;">🚪 CAFE</div>
                 </div>
+
+                <!-- Benches and Picnic Table seat hotspots -->
+                <div class="viewport-chair seat-interactive" data-table-id="10" style="top: 550px; left: 70px; width: 26px; height: 26px;">🪑</div>
+                <div class="viewport-chair seat-interactive" data-table-id="11" style="top: 155px; left: 340px; width: 26px; height: 26px;">🪑</div>
+                <div class="viewport-chair seat-interactive" data-table-id="12" style="top: 155px; left: 625px; width: 26px; height: 26px;">🪑</div>
+                <div class="viewport-chair seat-interactive" data-table-id="13" style="top: 355px; left: 915px; width: 26px; height: 26px;">🪑</div>
+                <div class="viewport-chair seat-interactive" data-table-id="14" style="top: 815px; left: 535px; width: 26px; height: 26px;">🪑</div>
+                <div class="viewport-chair seat-interactive" data-table-id="15" style="top: 815px; left: 625px; width: 26px; height: 26px;">🪑</div>
               </div>
 
               <!-- ACTIVE SPRITES (ABSOLUTELY POSITIONED) -->
               <!-- Character sprite -->
               <div class="lounge-sprite character-sprite" id="lounge-character" style="top: 350px; left: 200px;">
                 <div class="sprite-wrapper">
-                  <svg><use id="char-svg-ref" href="#char-avatar-0"></use></svg>
+                  <svg viewBox="0 0 16 16"><use id="char-svg-ref" href="#char-avatar-0"></use></svg>
                 </div>
                 <div class="speech-bubble-lounge" id="char-speech">Hey! Use WASD / Arrow keys or click floor to walk. Click chairs to study!</div>
                 <div class="character-name-label" id="char-name-label">y3ee</div>
@@ -153,7 +161,7 @@
               <!-- Pet sprite -->
               <div class="lounge-sprite pet-sprite" id="lounge-pet" style="top: 370px; left: 240px;">
                 <div class="sprite-wrapper">
-                  <svg><use id="pet-svg-ref" href="#pet-puppy"></use></svg>
+                  <svg viewBox="0 0 16 16"><use id="pet-svg-ref" href="#pet-puppy"></use></svg>
                 </div>
                 <div class="pet-heart-effect" id="pet-heart">❤️</div>
                 <div class="speech-bubble-lounge" id="pet-speech">Woof!</div>
@@ -179,7 +187,7 @@
             <!-- Hunger Meter -->
             <div class="meter-item">
               <div class="meter-labels">
-                <span class="meter-title">🍗 Hunger / Energy</span>
+                <span class="meter-title">🍗 Hunger</span>
                 <span class="meter-val" id="pet-hunger-text">100%</span>
               </div>
               <div class="retro-progress-bar">
@@ -239,11 +247,11 @@
         <!-- TIMER & DISCORD STATUS SECTION -->
         <section class="lounge-sidebar-card timer-session-card">
           <div class="sidebar-card-header">
-            <h3 class="sidebar-card-title">Study Session</h3>
+            <h3 class="sidebar-card-title">Session</h3>
           </div>
           
           <div class="session-status-selector">
-            <label class="session-label" for="lounge-status-select">Discord-style Status / Task:</label>
+            <label class="session-label" for="lounge-status-select">Status / Task:</label>
             <select class="session-dropdown" id="lounge-status-select" disabled>
               <option value="none">Choose study tool...</option>
               <option value="book">📚 Studying with Book</option>
@@ -279,17 +287,7 @@
           </div>
           
           <ul class="task-list-items" id="lounge-task-items-list">
-            <!-- Starting Checklist Items -->
-            <li class="task-list-item">
-              <input type="checkbox" class="task-checkbox" data-task-id="starting-1">
-              <span class="task-text-label">Review math study slides</span>
-              <button class="task-delete-btn" data-task-id="starting-1">&times;</button>
-            </li>
-            <li class="task-list-item">
-              <input type="checkbox" class="task-checkbox" data-task-id="starting-2">
-              <span class="task-text-label">Write draft introduction paragraph</span>
-              <button class="task-delete-btn" data-task-id="starting-2">&times;</button>
-            </li>
+            <!-- Rendered dynamically -->
           </ul>
         </section>
 
@@ -502,6 +500,11 @@
       <rect x="5" y="5" width="1" height="2" fill="#1E293B"/>
       <rect x="10" y="5" width="1" height="2" fill="#1E293B"/>
       <rect x="7.5" y="9" width="1" height="2" fill="#F43F5E"/>
+      <!-- Body and legs for front view -->
+      <rect x="4" y="11" width="8" height="3" fill="#D97706"/>
+      <rect x="6" y="11" width="4" height="3" fill="#FFFBEB"/>
+      <rect x="4" y="14" width="2" height="2" fill="#78350F"/>
+      <rect x="10" y="14" width="2" height="2" fill="#78350F"/>
     </symbol>
     <symbol id="pet-puppy-back" viewBox="0 0 16 16">
       <rect x="2" y="3" width="2" height="6" fill="#78350F"/>
@@ -550,6 +553,11 @@
       <rect x="7.5" y="8.5" width="1" height="1" fill="#FDA4AF"/>
       <line x1="2" y1="8" x2="5" y2="8" stroke="#FFFBEB" stroke-width="1"/>
       <line x1="11" y1="8" x2="14" y2="8" stroke="#FFFBEB" stroke-width="1"/>
+      <!-- Body and legs for front view -->
+      <rect x="4" y="11" width="8" height="3" fill="#F59E0B"/>
+      <rect x="6" y="11" width="4" height="3" fill="#FFFBEB"/>
+      <rect x="4" y="14" width="2" height="2" fill="#D97706"/>
+      <rect x="10" y="14" width="2" height="2" fill="#D97706"/>
     </symbol>
     <symbol id="pet-kitty-back" viewBox="0 0 16 16">
       <rect x="3" y="2" width="2" height="2" fill="#D97706"/>
@@ -598,6 +606,11 @@
       <rect x="10" y="7" width="1" height="2" fill="#1E293B"/>
       <rect x="7.5" y="9" width="1" height="1" fill="#FDA4AF"/>
       <rect x="7" y="10" width="2" height="1" fill="#E2E8F0"/>
+      <!-- Body and legs for front view -->
+      <rect x="4" y="12" width="8" height="2" fill="#F8FAFC"/>
+      <rect x="5" y="12" width="6" height="2" fill="#E2E8F0"/>
+      <rect x="4" y="14" width="2" height="2" fill="#CBD5E1"/>
+      <rect x="10" y="14" width="2" height="2" fill="#CBD5E1"/>
     </symbol>
     <symbol id="pet-bunny-back" viewBox="0 0 16 16">
       <rect x="4" y="1" width="2" height="5" fill="#F1F5F9"/>
@@ -648,6 +661,11 @@
       <rect x="3" y="8" width="1.5" height="1" fill="#FDA4AF" opacity="0.8"/>
       <rect x="11.5" y="8" width="1.5" height="1" fill="#FDA4AF" opacity="0.8"/>
       <path d="M5 8.5C5 9.5 7 10 8 10C9 10 11 9.5 11 8.5" stroke="#065F46" stroke-width="1" stroke-linecap="round" fill="none"/>
+      <!-- Body and legs for front view -->
+      <rect x="5" y="12" width="6" height="2" fill="#10B981"/>
+      <rect x="6" y="12" width="4" height="2" fill="#FEF08A"/>
+      <rect x="4" y="14" width="2" height="2" fill="#065F46"/>
+      <rect x="10" y="14" width="2" height="2" fill="#065F46"/>
     </symbol>
     <symbol id="pet-frog-back" viewBox="0 0 16 16">
       <rect x="3" y="5" width="10" height="7" fill="#10B981"/>
@@ -694,6 +712,9 @@
       <polygon points="8,7.5 7.5,9.5 8.5,9.5" fill="#D97706"/>
       <rect x="5" y="10" width="6" height="3" fill="#FFFBEB"/>
       <rect x="6" y="10.5" width="4" height="2" fill="#D97706" opacity="0.3"/>
+      <!-- Feet for owl -->
+      <rect x="5" y="13" width="2" height="2" fill="#D97706"/>
+      <rect x="9" y="13" width="2" height="2" fill="#D97706"/>
     </symbol>
     <symbol id="pet-owl-back" viewBox="0 0 16 16">
       <rect x="3" y="3" width="10" height="10" fill="#92400E"/>

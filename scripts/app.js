@@ -8,6 +8,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const coinsEl = document.getElementById('stat-coins');
   const badgesCountEl = document.getElementById('nav-badges-count');
 
+  // Safety reset: ensure page is scrollable on load if onboarding is done
+  const _savedRaw = localStorage.getItem('study_lounge_state');
+  if (_savedRaw) {
+    try {
+      const _saved = JSON.parse(_savedRaw);
+      if (_saved && _saved.onboardingComplete) {
+        document.body.style.overflow = '';
+        const _overlay = document.getElementById('onboarding-overlay');
+        if (_overlay) { _overlay.classList.remove('active'); }
+      }
+    } catch(e) {}
+  }
+
   function syncAll() {
     if (coinsEl) coinsEl.textContent = state.coins;
     if (badgesCountEl) badgesCountEl.textContent = state.badges;
@@ -22,11 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const onboardingOverlay = document.getElementById('onboarding-overlay');
     if (onboardingOverlay) {
       if (state.onboardingComplete) {
-        onboardingOverlay.style.display = 'none';
         onboardingOverlay.classList.remove('active');
         document.body.style.overflow = '';
       } else {
-        onboardingOverlay.style.display = 'flex';
         onboardingOverlay.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
@@ -163,8 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Name change
   state.on('nameChange', (data) => {
-    if (profileNameEl) {
-      profileNameEl.textContent = data.name;
+    if (levelEl) {
+      levelEl.textContent = `${data.name} Level ${state.petLevel}`;
     }
   });
 
@@ -199,9 +210,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!containerBox) return;
     const petSymbol = petSymbols[petIndex] || "#pet-puppy";
     containerBox.innerHTML = `
-      <svg style="width: 100%; height: 100%; padding: 4px;"><use href="#char-avatar-${charIndex}"></use></svg>
+      <svg viewBox="0 0 16 16" style="width: 100%; height: 100%; padding: 4px;"><use href="#char-avatar-${charIndex}"></use></svg>
       <div class="pet-avatar-overlay">
-        <svg><use href="${petSymbol}"></use></svg>
+        <svg viewBox="0 0 16 16"><use href="${petSymbol}"></use></svg>
       </div>
     `;
   }
@@ -248,6 +259,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Update Pet Level name
     if (levelEl) {
       levelEl.textContent = `${data.petName} Level 1`;
+    }
+
+    // Refresh My Pet page details if active
+    if (mypetPage && mypetPage.classList.contains('active')) {
+      initMypetPage();
     }
   });
 
@@ -344,10 +360,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Render Character and Pet in Welcome Screen
     if (welcomeAvatarChar) {
-      welcomeAvatarChar.innerHTML = `<svg><use href="#char-avatar-${currentAvatarIdx}"></use></svg>`;
+      welcomeAvatarChar.innerHTML = `<svg viewBox="0 0 16 16"><use href="#char-avatar-${currentAvatarIdx}"></use></svg>`;
     }
     if (welcomeAvatarPet) {
-      welcomeAvatarPet.innerHTML = `<svg><use href="${petSymbols[currentPetIdx]}"></use></svg>`;
+      welcomeAvatarPet.innerHTML = `<svg viewBox="0 0 16 16"><use href="${petSymbols[currentPetIdx]}"></use></svg>`;
     }
 
     // Set Welcome Dialog Text
@@ -571,16 +587,267 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Nav link active toggle
+  // =====================================================
+  // MY PET PAGE - TAB SWITCHING & PET ROOM LOGIC
+  // =====================================================
+
+  const mainContent   = document.querySelector('.main-content');
+  const mypetPage     = document.getElementById('mypet-page');
+  const mypetRoom     = document.getElementById('mypet-room');
+  const mypetPetSprite  = document.getElementById('mypet-pet-sprite');
+  const mypetPetSvg     = document.getElementById('mypet-pet-svg');
+  const mypetSpeech     = document.getElementById('mypet-speech');
+  const mypetSpeechText = document.getElementById('mypet-speech-text');
+  const mypetAvatarSvg  = document.getElementById('mypet-avatar-svg');
+  const mypetNameLabel  = document.getElementById('mypet-name-label');
+  const mypetLevelLabel = document.getElementById('mypet-level-label');
+  const mypetMoodLabel  = document.getElementById('mypet-mood-label');
+  const mypetHungerBar  = document.getElementById('mypet-hunger-bar');
+  const mypetHungerPct  = document.getElementById('mypet-hunger-pct');
+  const mypetHealthBar  = document.getElementById('mypet-health-bar');
+  const mypetHealthPct  = document.getElementById('mypet-health-pct');
+  const mypetFeedMsg    = document.getElementById('mypet-feed-msg');
+  const mypetReviveCard = document.getElementById('mypet-revive-card');
+  const mypetReviveBtn  = document.getElementById('mypet-revive-btn');
+  const mypetFeedSnack  = document.getElementById('mypet-feed-snack');
+  const mypetFeedMeal   = document.getElementById('mypet-feed-meal');
+  const mypetFeedTreat  = document.getElementById('mypet-feed-treat');
+
+  // Pet symbols mapping
+  const petSyms = ["pet-puppy", "pet-kitty", "pet-bunny", "pet-frog", "pet-owl"];
+
+  const petDialogues = [
+    'Let\'s play! 🎾', 'I\'m happy! 😊', 'Pet me! 🥺',
+    'Zzzz... 💤', 'What\'s that? 👀', '*Yipeee* 🐾',
+    'Yay, you\'re here!', 'I love you! ❤️', 'Feed me? 🍖',
+    'Play with me! 🎈', 'Best day ever! ✨', 'I found a ball! ⚽'
+  ];
+
+  let petWanderInterval = null;
+  let speechHideTimeout = null;
+  let petX = 40, petY = 45;
+
+  function getMoodLabel(hunger, health) {
+    if (health < 20) return '😵 Fainted';
+    if (hunger < 20) return '😰 Starving';
+    if (hunger < 40) return '😟 Hungry';
+    if (health < 50) return '🤒 Unwell';
+    if (hunger > 80 && health > 80) return '😄 Very Happy';
+    return '😊 Happy';
+  }
+
+  function updateMypetStats() {
+    const hunger = state.petHunger;
+    const health = state.petHealth;
+    const isDead = state.petIsDead;
+    if (mypetHungerBar) mypetHungerBar.style.width = hunger + '%';
+    if (mypetHungerPct) mypetHungerPct.textContent = hunger + '%';
+    if (mypetHealthBar) mypetHealthBar.style.width = health + '%';
+    if (mypetHealthPct) mypetHealthPct.textContent = health + '%';
+    if (mypetMoodLabel) mypetMoodLabel.textContent = getMoodLabel(hunger, health);
+    if (mypetLevelLabel) mypetLevelLabel.textContent = `Level ${state.petLevel}`;
+    if (mypetReviveCard) mypetReviveCard.style.display = isDead ? 'block' : 'none';
+  }
+
+  function placePet(x, y, animate) {
+    if (!mypetPetSprite) return;
+    mypetPetSprite.style.transition = animate
+      ? 'left 1.4s cubic-bezier(0.45,0,0.55,1), top 1.4s cubic-bezier(0.45,0,0.55,1)'
+      : 'none';
+    mypetPetSprite.style.left = x + '%';
+    mypetPetSprite.style.top  = y + '%';
+  }
+
+  function showSpeech(text) {
+    if (!mypetSpeech || !mypetSpeechText) return;
+    mypetSpeechText.textContent = text;
+    mypetSpeech.classList.add('visible');
+    clearTimeout(speechHideTimeout);
+    speechHideTimeout = setTimeout(() => mypetSpeech.classList.remove('visible'), 2800);
+  }
+
+  function startWander() {
+    stopWander();
+    petWanderInterval = setInterval(() => {
+      if (!mypetPage || !mypetPage.classList.contains('active')) return;
+      const newX = 8 + Math.random() * 72;
+      const newY = 30 + Math.random() * 50;
+
+      const dx = newX - petX;
+      const dy = newY - petY;
+      const absDx = Math.abs(dx);
+      const absDy = Math.abs(dy);
+
+      let suffix = "";
+      let scaleX = 1;
+
+      if (absDx > absDy) {
+        suffix = "-side";
+        scaleX = dx > 0 ? 1 : -1;
+      } else {
+        suffix = dy > 0 ? "" : "-back";
+        scaleX = 1;
+      }
+
+      const petIdx = state.selectedPetIndex || 0;
+      const petBase = petSyms[petIdx] || "pet-puppy";
+
+      if (mypetPetSvg) {
+        mypetPetSvg.innerHTML = `<use href="#${petBase}${suffix}"></use>`;
+        mypetPetSvg.style.transform = `scaleX(${scaleX})`;
+      }
+
+      petX = newX; petY = newY;
+      placePet(petX, petY, true);
+
+      // Return to facing front after arriving (1.4 seconds)
+      setTimeout(() => {
+        if (!mypetPage || !mypetPage.classList.contains('active')) return;
+        if (mypetPetSvg) {
+          mypetPetSvg.innerHTML = `<use href="#${petBase}"></use>`;
+          mypetPetSvg.style.transform = 'scaleX(1)';
+        }
+      }, 1400);
+
+      if (Math.random() < 0.10) {
+        const line = petDialogues[Math.floor(Math.random() * petDialogues.length)];
+        setTimeout(() => showSpeech(line), 700);
+      }
+    }, 3000);
+  }
+
+  function stopWander() {
+    if (petWanderInterval) { clearInterval(petWanderInterval); petWanderInterval = null; }
+  }
+
+  function initMypetPage() {
+    const petIdx = state.selectedPetIndex || 0;
+    const sym = petSyms[petIdx] || "pet-puppy";
+    if (mypetPetSvg) {
+      mypetPetSvg.innerHTML = `<use href="#${sym}"></use>`;
+      mypetPetSvg.setAttribute('viewBox', '0 0 16 16');
+    }
+    if (mypetAvatarSvg) {
+      mypetAvatarSvg.innerHTML = `<use href="#${sym}"></use>`;
+      mypetAvatarSvg.setAttribute('viewBox', '0 0 16 16');
+    }
+    const petNames = ['Puppy', 'Kitty', 'Bunny', 'Frog', 'Owl'];
+    if (mypetNameLabel) mypetNameLabel.textContent = state.petName || petNames[petIdx] || 'Companion';
+    updateMypetStats();
+    petX = 35 + Math.random() * 25;
+    petY = 38 + Math.random() * 25;
+    placePet(petX, petY, false);
+    startWander();
+  }
+
+  // Feed buttons
+  function showFeedMsg(msg) {
+    if (!mypetFeedMsg) return;
+    mypetFeedMsg.textContent = msg;
+    setTimeout(() => { mypetFeedMsg.textContent = ''; }, 2500);
+  }
+
+  // Floating hearts logic
+  function triggerMypetHearts() {
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => {
+        if (!mypetPetSprite) return;
+        const heart = document.createElement('div');
+        heart.className = 'mypet-heart-item';
+        heart.textContent = '❤️';
+        const offsetLeft = (Math.random() * 30 - 15);
+        heart.style.left = `calc(50% + ${offsetLeft}px)`;
+        const scale = 0.8 + Math.random() * 0.5;
+        heart.style.transform = `translateX(-50%) scale(${scale})`;
+        
+        mypetPetSprite.appendChild(heart);
+        
+        setTimeout(() => {
+          heart.remove();
+        }, 1500);
+      }, i * 200);
+    }
+  }
+
+  // Click pet to trigger hearts and speech
+  if (mypetPetSprite) {
+    mypetPetSprite.addEventListener('click', () => {
+      triggerMypetHearts();
+      const happyLines = ['*purr* ❤️', '*pant pant* 🐾', 'Hehe, tickles! 😄', 'I love you! ❤️', 'Bark! 🐶', 'Meow! 🐱'];
+      showSpeech(happyLines[Math.floor(Math.random() * happyLines.length)]);
+    });
+  }
+
+  if (mypetFeedSnack) {
+    mypetFeedSnack.addEventListener('click', () => {
+      if (state.feedPet('Snack', 5, 15, 5)) { 
+        updateMypetStats(); 
+        showFeedMsg('Yummy snack! +15% 🍪'); 
+        showSpeech('Nom nom! 😋'); 
+        triggerMypetHearts();
+      }
+      else showFeedMsg('Not enough coins!');
+    });
+  }
+  if (mypetFeedMeal) {
+    mypetFeedMeal.addEventListener('click', () => {
+      if (state.feedPet('Meal', 15, 35, 15)) { 
+        updateMypetStats(); 
+        showFeedMsg('Delicious! +35% 🍖'); 
+        showSpeech('So full! 😊'); 
+        triggerMypetHearts();
+      }
+      else showFeedMsg('Not enough coins!');
+    });
+  }
+  if (mypetFeedTreat) {
+    mypetFeedTreat.addEventListener('click', () => {
+      if (state.feedPet('Treat', 25, 50, 25)) { 
+        updateMypetStats(); 
+        showFeedMsg('Tasty treat! +50% 🎂'); 
+        showSpeech('Best day ever! 🎉'); 
+        triggerMypetHearts();
+      }
+      else showFeedMsg('Not enough coins!');
+    });
+  }
+  if (mypetReviveBtn) {
+    mypetReviveBtn.addEventListener('click', () => {
+      if (state.revivePet(50)) { 
+        updateMypetStats(); 
+        showFeedMsg('Pet revived! 🎊'); 
+        showSpeech('I\'m back! 🌟'); 
+        triggerMypetHearts();
+      }
+      else showFeedMsg('Need 50 coins to revive!');
+    });
+  }
+
+  state.on('petStatsChange', () => {
+    if (mypetPage && mypetPage.classList.contains('active')) updateMypetStats();
+  });
+
+  state.on('taskCompletedEffect', () => {
+    triggerMypetHearts();
+  });
+
+  // Nav link tab switching
   navLinks.forEach(link => {
     link.addEventListener('click', () => {
       navLinks.forEach(l => l.classList.remove('active'));
       link.classList.add('active');
-      
       const tab = link.getAttribute('data-tab');
-      state.trigger('speechChange', {
-        text: `Switched to the ${tab.toUpperCase()} tab! Let's explore!`
-      });
+      if (tab === 'mypet') {
+        if (mainContent) mainContent.style.display = 'none';
+        if (mypetPage) { mypetPage.classList.add('active'); initMypetPage(); }
+        state.trigger('speechChange', { text: 'Say hello to your pet! 🐾' });
+      } else {
+        if (mainContent) mainContent.style.display = '';
+        if (mypetPage) { mypetPage.classList.remove('active'); stopWander(); }
+        state.trigger('speechChange', {
+          text: `Switched to ${tab === 'learn' ? 'Home' : tab.charAt(0).toUpperCase() + tab.slice(1)}! Let's explore!`
+        });
+      }
     });
   });
 
