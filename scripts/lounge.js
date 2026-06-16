@@ -1,8 +1,24 @@
 /* scripts/lounge.js */
+import { auth } from './firebase.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const state = window.AppState;
   if (!state) return;
+
+  // Lounge Page Guard: redirect back to homepage if onboarding is not complete
+  function guardLounge() {
+    if (!state.onboardingComplete) {
+      window.location.href = 'index.html';
+    }
+  }
+
+  // Check immediately based on localStorage
+  guardLounge();
+
+  // Also verify when Firestore state loads
+  state.on('stateLoaded', () => {
+    guardLounge();
+  });
 
   // DOM Elements
   const backToHomeBtn = document.getElementById('back-to-home-btn');
@@ -80,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let studySeconds = 0;
   let studyTimerActive = false;
   let activeTool = 'none';
+  let lastTickTime = 0;
 
   // Pet Names mapping
   const petNamesList = ["Puppy", "Kitty", "Bunny", "Frog", "Owl"];
@@ -616,37 +633,52 @@ document.addEventListener('DOMContentLoaded', () => {
     studyTimerActive = true;
     if (timerToggleBtn) timerToggleBtn.textContent = "Pause Focus";
 
-    studyTimer = setInterval(() => {
-      studySeconds++;
-      
-      if (activeTool !== 'rest') {
-        state.addStudySecond();
-      } else {
-        state.addRestSecond();
-      }
-      
-      // Update timer clock UI
-      const hrs = Math.floor(studySeconds / 3600).toString().padStart(2, '0');
-      const mins = Math.floor((studySeconds % 3600) / 60).toString().padStart(2, '0');
-      const secs = (studySeconds % 60).toString().padStart(2, '0');
-      if (timerDisplayClock) {
-        timerDisplayClock.textContent = `${hrs}:${mins}:${secs}`;
-      }
+    lastTickTime = Date.now();
 
-      // Interactive reward: Earn 1 Coin and 2 XP every 20 seconds of focused study!
-      if (studySeconds % 20 === 0) {
+    studyTimer = setInterval(() => {
+      const now = Date.now();
+      const elapsedMs = now - lastTickTime;
+      const elapsedSec = Math.floor(elapsedMs / 1000);
+      
+      if (elapsedSec >= 1) {
+        const lastRewardedSecond = studySeconds;
+        studySeconds += elapsedSec;
+        
         if (activeTool !== 'rest') {
-          state.addCoins(1);
-          state.addXp(2);
-          showSpeechBubble('char-speech', "Focused work is paying off! (+1 coin, +2 XP) 💰");
-          
-          // Pet heart effect on focus
-          triggerPetHearts();
+          state.addStudySecond(elapsedSec);
         } else {
-          // rest boosts pet health slowly
-          state.petHealth = Math.min(100, state.petHealth + 2);
-          updatePetStatsUI();
-          showSpeechBubble('pet-speech', "Yawn! Rest matches focus! ❤️");
+          state.addRestSecond(elapsedSec);
+        }
+        
+        lastTickTime += elapsedSec * 1000;
+        
+        // Update timer clock UI
+        const hrs = Math.floor(studySeconds / 3600).toString().padStart(2, '0');
+        const mins = Math.floor((studySeconds % 3600) / 60).toString().padStart(2, '0');
+        const secs = (studySeconds % 60).toString().padStart(2, '0');
+        if (timerDisplayClock) {
+          timerDisplayClock.textContent = `${hrs}:${mins}:${secs}`;
+        }
+  
+        // Interactive reward: Earn 1 Coin and 2 XP every 20 seconds of focused study!
+        const prevIntervals = Math.floor(lastRewardedSecond / 20);
+        const currentIntervals = Math.floor(studySeconds / 20);
+        const intervalsCrossed = currentIntervals - prevIntervals;
+        
+        if (intervalsCrossed > 0) {
+          if (activeTool !== 'rest') {
+            state.addCoins(1 * intervalsCrossed);
+            state.addXp(2 * intervalsCrossed);
+            showSpeechBubble('char-speech', `Focused work is paying off! (+${1 * intervalsCrossed} coin, +${2 * intervalsCrossed} XP) 💰`);
+            
+            // Pet heart effect on focus
+            triggerPetHearts();
+          } else {
+            // rest boosts pet health slowly
+            state.petHealth = Math.min(100, state.petHealth + 2 * intervalsCrossed);
+            updatePetStatsUI();
+            showSpeechBubble('pet-speech', "Yawn! Rest matches focus! ❤️");
+          }
         }
       }
     }, 1000);
@@ -766,15 +798,82 @@ document.addEventListener('DOMContentLoaded', () => {
     if (petNameLabel) petNameLabel.textContent = data.name;
   });
 
+  // Helper to sync Achievements UI
+  function syncAchievementsUI() {
+    const morningEl = document.getElementById('achieve-morning-date');
+    const notesEl = document.getElementById('achieve-notes-date');
+    const loungeEl = document.getElementById('achieve-lounge-date');
+    
+    if (morningEl) {
+      const isUnlocked = state.goals.study30Mins.claimed || state.goals.study30Mins.completed;
+      if (isUnlocked) {
+        morningEl.textContent = "Unlocked";
+        morningEl.className = "achievement-date unlocked";
+        morningEl.style.color = "var(--bg-green)";
+        morningEl.style.fontWeight = "bold";
+      } else {
+        morningEl.textContent = "Locked";
+        morningEl.className = "achievement-date locked";
+        morningEl.style.color = "";
+        morningEl.style.fontWeight = "";
+      }
+    }
+    
+    if (notesEl) {
+      const isUnlocked = state.totalTasksCompleted > 0 || (state.goals.finishOneTask.claimed || state.goals.finishOneTask.completed);
+      if (isUnlocked) {
+        notesEl.textContent = "Unlocked";
+        notesEl.className = "achievement-date unlocked";
+        notesEl.style.color = "var(--bg-green)";
+        notesEl.style.fontWeight = "bold";
+      } else {
+        notesEl.textContent = "Locked";
+        notesEl.className = "achievement-date locked";
+        notesEl.style.color = "";
+        notesEl.style.fontWeight = "";
+      }
+    }
+    
+    if (loungeEl) {
+      const isUnlocked = state.onboardingComplete;
+      if (isUnlocked) {
+        loungeEl.textContent = "Unlocked";
+        loungeEl.className = "achievement-date unlocked";
+        loungeEl.style.color = "var(--bg-green)";
+        loungeEl.style.fontWeight = "bold";
+      } else {
+        loungeEl.textContent = "Locked";
+        loungeEl.className = "achievement-date locked";
+        loungeEl.style.color = "";
+        loungeEl.style.fontWeight = "";
+      }
+    }
+  }
+
   // achievements modal in lounge nav
   const achievementsNavBtn = document.getElementById('achievements-nav-btn');
-  if (achievementsNavBtn) {
+  const achievementsModal = document.getElementById('achievements-modal');
+  const achievementsModalClose = document.getElementById('achievements-modal-close');
+
+  if (achievementsNavBtn && achievementsModal) {
     achievementsNavBtn.addEventListener('click', () => {
-      // Show simple achievements status list inside viewport alert
-      const achieveTexts = `Achievements Log: \n\n🏆 Lounge Explorer: ${state.badges >= 1 ? '✓ Unlocked' : 'Locked'}\n📖 Notes Master: ${state.badges >= 2 ? '✓ Unlocked' : 'Locked'}`;
-      alert(achieveTexts);
+      syncAchievementsUI();
+      achievementsModal.classList.add('active');
     });
   }
+
+  if (achievementsModalClose) {
+    achievementsModalClose.addEventListener('click', () => {
+      achievementsModal.classList.remove('active');
+    });
+  }
+
+  // Close modals when clicking backdrop
+  window.addEventListener('click', (e) => {
+    if (e.target === achievementsModal) {
+      achievementsModal.classList.remove('active');
+    }
+  });
 
   // Room tabs navigation clicks
   if (tabCafe) {
@@ -1137,6 +1236,36 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }
+
+  // Helper to show cloud sync status toasts
+  function showSyncToast(isError, message) {
+    const existing = document.querySelector('.sync-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = `sync-toast ${isError ? 'error' : 'success'}`;
+    toast.innerHTML = isError 
+      ? `<span>⚠️ Sync Error: ${message}</span>` 
+      : `<span>☁️ Synced with Cloud</span>`;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(10px)';
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  state.on('syncSuccess', (data) => {
+    // Only show sync success toast on foreground saves
+    if (data && !data.isBackground) {
+      showSyncToast(false);
+    }
+  });
+
+  state.on('syncError', (err) => {
+    showSyncToast(true, err.message || err);
+  });
 
   const game = new Phaser.Game(config);
 

@@ -798,7 +798,44 @@
       <rect x="5" y="5" width="5" height="1" fill="#4E220F"/>
       <rect x="5" y="7" width="1" height="4" fill="#FCA5A5"/>
     </symbol>
-  </svg>
+  <!-- ACHIEVEMENTS / BADGES MODAL -->
+  <div class="modal-backdrop" id="achievements-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Achievements & Badges</h3>
+        <button class="modal-close-btn" id="achievements-modal-close">&times;</button>
+      </div>
+      <div class="achievements-list">
+        <!-- Achievement 1 -->
+        <div class="achievement-item">
+          <div class="achievement-icon-box">☕</div>
+          <div class="achievement-info">
+            <h4 class="achievement-name">Morning Brew</h4>
+            <p class="achievement-desc">Complete your first Pomodoro session of the day.</p>
+          </div>
+          <span class="achievement-date locked" id="achieve-morning-date">Locked</span>
+        </div>
+        <!-- Achievement 2 -->
+        <div class="achievement-item">
+          <div class="achievement-icon-box">📚</div>
+          <div class="achievement-info">
+            <h4 class="achievement-name">Notes Master</h4>
+            <p class="achievement-desc">Create or complete a task on the checklist.</p>
+          </div>
+          <span class="achievement-date locked" id="achieve-notes-date">Locked</span>
+        </div>
+        <!-- Achievement 3 -->
+        <div class="achievement-item">
+          <div class="achievement-icon-box">🐾</div>
+          <div class="achievement-info">
+            <h4 class="achievement-name">Lounge Explorer</h4>
+            <p class="achievement-desc">Complete onboarding and visit the Lounge.</p>
+          </div>
+          <span class="achievement-date locked" id="achieve-lounge-date">Locked</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Javascript Modules -->
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>

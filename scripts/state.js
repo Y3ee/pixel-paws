@@ -61,7 +61,7 @@ const AppState = {
   },
 
   // LocalStorage & Firestore Persistence
-  save() {
+  save(isBackground = false) {
     const data = {
       xp: this.xp,
       coins: this.coins,
@@ -97,9 +97,25 @@ const AppState = {
     // Save to Firestore if enabled and authenticated
     if (isFirebaseEnabled && auth && auth.currentUser) {
       const docRef = doc(db, "users", auth.currentUser.uid);
-      setDoc(docRef, data, { merge: true })
-        .then(() => console.log("State successfully synced with Firestore!"))
-        .catch(err => console.error("Firestore sync failed:", err));
+      
+      // Add email and uid helpers so the user can easily identify documents in the Firebase console
+      const firestoreData = {
+        ...data,
+        email: auth.currentUser.isAnonymous ? "Guest" : auth.currentUser.email,
+        isAnonymous: auth.currentUser.isAnonymous,
+        uid: auth.currentUser.uid,
+        updatedAt: new Date().toISOString()
+      };
+
+      setDoc(docRef, firestoreData, { merge: true })
+        .then(() => {
+          console.log("State successfully synced with Firestore!");
+          this.trigger('syncSuccess', { isBackground });
+        })
+        .catch(err => {
+          console.error("Firestore sync failed:", err);
+          this.trigger('syncError', err);
+        });
     }
   },
 
@@ -124,12 +140,14 @@ const AppState = {
         this.applyStateData(data);
         console.log("Successfully loaded state from Firestore!");
         this.trigger('stateLoaded');
+        this.trigger('syncSuccess', { isBackground: true }); // trigger background sync success on initial load
       } else {
         console.log("No state found in Firestore. Creating initial save.");
         this.save();
       }
     } catch (e) {
       console.error("Failed to load state from Firestore", e);
+      this.trigger('syncError', e);
     }
   },
 
@@ -151,6 +169,10 @@ const AppState = {
     if (data.petHunger !== undefined) this.petHunger = data.petHunger;
     if (data.petHealth !== undefined) this.petHealth = data.petHealth;
     if (data.petIsDead !== undefined) this.petIsDead = data.petIsDead;
+    if (data.totalStudyTime !== undefined) this.totalStudyTime = data.totalStudyTime;
+    if (data.totalRestTime !== undefined) this.totalRestTime = data.totalRestTime;
+    if (data.customTasks !== undefined) this.customTasks = data.customTasks;
+    if (data.totalTasksCompleted !== undefined) this.totalTasksCompleted = data.totalTasksCompleted;
     if (data.goals !== undefined) {
       if (data.goals.morningBrew || data.goals.readNotes || data.goals.walkPark) {
         this.goals = {
@@ -169,10 +191,6 @@ const AppState = {
       }
     }
     this.recalculateGoalsProgress();
-    if (data.totalStudyTime !== undefined) this.totalStudyTime = data.totalStudyTime;
-    if (data.totalRestTime !== undefined) this.totalRestTime = data.totalRestTime;
-    if (data.customTasks !== undefined) this.customTasks = data.customTasks;
-    if (data.totalTasksCompleted !== undefined) this.totalTasksCompleted = data.totalTasksCompleted;
 
     // Force heal pet to 100% on load/sync to restore it
     this.petHunger = 100;
@@ -431,8 +449,8 @@ const AppState = {
     }
   },
 
-  addStudySecond() {
-    this.totalStudyTime++;
+  addStudySecond(amount = 1) {
+    this.totalStudyTime += amount;
     this.trigger('studyTimeChange', { totalStudyTime: this.totalStudyTime });
     
     // Update study30Mins goal progress
@@ -479,16 +497,16 @@ const AppState = {
       }
     }
 
-    if (this.totalStudyTime % 10 === 0) {
-      this.save();
+    if (this.totalStudyTime % 10 === 0 || amount > 1) {
+      this.save(true);
     }
   },
 
-  addRestSecond() {
-    this.totalRestTime++;
+  addRestSecond(amount = 1) {
+    this.totalRestTime += amount;
     this.trigger('restTimeChange', { totalRestTime: this.totalRestTime });
-    if (this.totalRestTime % 10 === 0) {
-      this.save();
+    if (this.totalRestTime % 10 === 0 || amount > 1) {
+      this.save(true);
     }
   },
 
@@ -592,6 +610,43 @@ const AppState = {
     }
     
     this.save();
+  },
+
+  resetToDefault(shouldSave = true) {
+    this.xp = 120;
+    this.coins = 45;
+    this.streak = 2;
+    this.badges = 0;
+    this.rank = 'Bronze';
+    this.petLevel = 1;
+    this.focusPoints = 30;
+    this.maxFocusPoints = 30;
+    this.selectedAvatarIndex = 0;
+    this.selectedPetIndex = 0;
+    this.petName = 'Companion';
+    this.onboardingComplete = false;
+    this.username = 'ScholarPaws';
+    this.age = 20;
+    this.totalStudyTime = 0;
+    this.totalRestTime = 0;
+    this.customTasks = [
+      { id: 'starting-1', text: 'Review math study slides', completed: false },
+      { id: 'starting-2', text: 'Write draft introduction paragraph', completed: false }
+    ];
+    this.totalTasksCompleted = 0;
+    this.petHunger = 100;
+    this.petHealth = 100;
+    this.petIsDead = false;
+    this.goals = {
+      dailyLogin: { completed: true, claimed: false, percent: 100, reward: 10 },
+      study30Mins: { completed: false, claimed: false, percent: 0, reward: 15 },
+      finishOneTask: { completed: false, claimed: false, percent: 0, reward: 20 },
+      dailyFocus: { completed: false, claimed: false, reward: 20 }
+    };
+    if (shouldSave) {
+      this.save();
+    }
+    this.trigger('stateLoaded');
   }
 };
 
@@ -604,11 +659,13 @@ window.AppState = AppState;
 if (isFirebaseEnabled && auth) {
   onAuthStateChanged(auth, async (user) => {
     if (user) {
-      console.log("Authenticated anonymously as:", user.uid);
+      console.log("Authenticated as:", user.uid, "Anonymous:", user.isAnonymous);
       await AppState.loadFromFirestore(user.uid);
+      AppState.trigger('authStateChanged', user);
     } else {
       console.log("Signing in anonymously...");
       signInAnonymously(auth).catch(err => console.error("Anon auth failed", err));
+      AppState.trigger('authStateChanged', null);
     }
   });
 }
