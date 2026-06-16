@@ -1,8 +1,76 @@
 /* app.js */
+import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from './firebase.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const state = window.AppState;
   if (!state) return;
+
+  const petSymbols = ["#pet-puppy", "#pet-kitty", "#pet-bunny", "#pet-frog", "#pet-owl"];
+  const petNamesList = ["Puppy", "Kitty", "Bunny", "Frog", "Owl"];
+
+  // Helper to render the avatar with character + pet overlay
+  function renderDualAvatar(containerBox, charIndex, petIndex) {
+    if (!containerBox) return;
+    const petSymbol = petSymbols[petIndex] || "#pet-puppy";
+    containerBox.innerHTML = `
+      <svg viewBox="0 0 16 16" style="width: 100%; height: 100%; padding: 4px;"><use href="#char-avatar-${charIndex}"></use></svg>
+      <div class="pet-avatar-overlay">
+        <svg viewBox="0 0 16 16"><use href="${petSymbol}"></use></svg>
+      </div>
+    `;
+  }
+
+  // Helper to sync Achievements UI
+  function syncAchievementsUI() {
+    const morningEl = document.getElementById('achieve-morning-date');
+    const notesEl = document.getElementById('achieve-notes-date');
+    const loungeEl = document.getElementById('achieve-lounge-date');
+    
+    if (morningEl) {
+      const isUnlocked = state.goals.study30Mins.claimed || state.goals.study30Mins.completed;
+      if (isUnlocked) {
+        morningEl.textContent = "Unlocked";
+        morningEl.className = "achievement-date unlocked";
+        morningEl.style.color = "var(--bg-green)";
+        morningEl.style.fontWeight = "bold";
+      } else {
+        morningEl.textContent = "Locked";
+        morningEl.className = "achievement-date locked";
+        morningEl.style.color = "";
+        morningEl.style.fontWeight = "";
+      }
+    }
+    
+    if (notesEl) {
+      const isUnlocked = state.totalTasksCompleted > 0 || (state.goals.finishOneTask.claimed || state.goals.finishOneTask.completed);
+      if (isUnlocked) {
+        notesEl.textContent = "Unlocked";
+        notesEl.className = "achievement-date unlocked";
+        notesEl.style.color = "var(--bg-green)";
+        notesEl.style.fontWeight = "bold";
+      } else {
+        notesEl.textContent = "Locked";
+        notesEl.className = "achievement-date locked";
+        notesEl.style.color = "";
+        notesEl.style.fontWeight = "";
+      }
+    }
+    
+    if (loungeEl) {
+      const isUnlocked = state.onboardingComplete;
+      if (isUnlocked) {
+        loungeEl.textContent = "Unlocked";
+        loungeEl.className = "achievement-date unlocked";
+        loungeEl.style.color = "var(--bg-green)";
+        loungeEl.style.fontWeight = "bold";
+      } else {
+        loungeEl.textContent = "Locked";
+        loungeEl.className = "achievement-date locked";
+        loungeEl.style.color = "";
+        loungeEl.style.fontWeight = "";
+      }
+    }
+  }
   
   // Initial sync from state
   const coinsEl = document.getElementById('stat-coins');
@@ -26,10 +94,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (badgesCountEl) badgesCountEl.textContent = state.badges;
     const xpEl = document.getElementById('stat-xp');
     if (xpEl) xpEl.textContent = state.xp;
+    
     const levelEl = document.getElementById('profile-pet-level');
-    if (levelEl) levelEl.textContent = `Level ${state.petLevel}`;
+    if (levelEl) {
+      const petNameStr = state.petName || petNamesList[state.selectedPetIndex] || "Companion";
+      levelEl.textContent = `${petNameStr} Level ${state.petLevel}`;
+    }
+    
     const profileNameEl = document.querySelector('.profile-name');
     if (profileNameEl) profileNameEl.textContent = state.username;
+    
+    // Render the correct saved avatar + pet overlay on top-right card
+    const profileAvatarBox = document.getElementById('main-profile-avatar-box');
+    renderDualAvatar(profileAvatarBox, state.selectedAvatarIndex, state.selectedPetIndex);
+    
+    // Sync achievements statuses
+    syncAchievementsUI();
     
     // Auto-hide or show onboarding overlay based on state
     const onboardingOverlay = document.getElementById('onboarding-overlay');
@@ -117,8 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let modalAvatarIdx = 0;
   let modalPetIdx = 0;
 
-  const petSymbols = ["#pet-puppy", "#pet-kitty", "#pet-bunny", "#pet-frog", "#pet-owl"];
-  const petNamesList = ["Puppy", "Kitty", "Bunny", "Frog", "Owl"];
+
 
   // Typewriter effect for speech bubble
   let speechTimeout;
@@ -205,17 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Helper to render the avatar with character + pet overlay
-  function renderDualAvatar(containerBox, charIndex, petIndex) {
-    if (!containerBox) return;
-    const petSymbol = petSymbols[petIndex] || "#pet-puppy";
-    containerBox.innerHTML = `
-      <svg viewBox="0 0 16 16" style="width: 100%; height: 100%; padding: 4px;"><use href="#char-avatar-${charIndex}"></use></svg>
-      <div class="pet-avatar-overlay">
-        <svg viewBox="0 0 16 16"><use href="${petSymbol}"></use></svg>
-      </div>
-    `;
-  }
+
 
   // Onboarding finished state subscriber
   state.on('onboardingFinished', (data) => {
@@ -258,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Update Pet Level name
     if (levelEl) {
-      levelEl.textContent = `${data.petName} Level 1`;
+      levelEl.textContent = `${data.petName} Level ${state.petLevel}`;
     }
 
     // Refresh My Pet page details if active
@@ -266,6 +335,54 @@ document.addEventListener('DOMContentLoaded', () => {
       initMypetPage();
     }
   });
+
+  // Auth state changed subscriber
+  state.on('authStateChanged', (user) => {
+    const profileEmailText = document.getElementById('profile-email-text');
+    const profileEmailGroup = document.getElementById('profile-email-group');
+    const profileLogoutBtn = document.getElementById('profile-logout-btn');
+    const profileLoginBtn = document.getElementById('profile-login-btn');
+    
+    if (user && !user.isAnonymous) {
+      if (profileEmailText) profileEmailText.textContent = `Logged in as: ${user.email}`;
+      if (profileLogoutBtn) profileLogoutBtn.style.display = 'block';
+      if (profileLoginBtn) profileLoginBtn.style.display = 'none';
+    } else {
+      if (profileEmailText) profileEmailText.textContent = `Logged in as: Guest`;
+      if (profileLogoutBtn) profileLogoutBtn.style.display = 'none';
+      if (profileLoginBtn) profileLoginBtn.style.display = 'block';
+    }
+    if (profileEmailGroup) profileEmailGroup.style.display = 'block';
+    syncAll();
+  });
+
+  // Auth Guard Helper
+  const authModal = document.getElementById('auth-modal');
+  const authModalClose = document.getElementById('auth-modal-close');
+
+  function checkEmailAuth(onAuthorized) {
+    if (auth.currentUser && !auth.currentUser.isAnonymous) {
+      onAuthorized();
+    } else {
+      if (authModal) {
+        authModal.classList.add('active');
+        // Clear auth fields and error message
+        const loginEmail = document.getElementById('login-email');
+        const loginPass = document.getElementById('login-password');
+        const regEmail = document.getElementById('register-email');
+        const regPass = document.getElementById('register-password');
+        const regConf = document.getElementById('register-confirm-password');
+        const errMsg = document.getElementById('auth-error-msg');
+        
+        if (loginEmail) loginEmail.value = '';
+        if (loginPass) loginPass.value = '';
+        if (regEmail) regEmail.value = '';
+        if (regPass) regPass.value = '';
+        if (regConf) regConf.value = '';
+        if (errMsg) errMsg.textContent = '';
+      }
+    }
+  }
 
 
   // --- UI INTERACTION HANDLERS ---
@@ -515,15 +632,21 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   if (profileNavIcon) {
-    profileNavIcon.addEventListener('click', openProfileModal);
+    profileNavIcon.addEventListener('click', () => {
+      openProfileModal();
+    });
   }
 
   if (viewProfileBtn) {
-    viewProfileBtn.addEventListener('click', openProfileModal);
+    viewProfileBtn.addEventListener('click', () => {
+      openProfileModal();
+    });
   }
 
   if (editProfileBtn) {
-    editProfileBtn.addEventListener('click', openProfileModal);
+    editProfileBtn.addEventListener('click', () => {
+      openProfileModal();
+    });
   }
 
   if (profileModalClose) {
@@ -584,6 +707,152 @@ document.addEventListener('DOMContentLoaded', () => {
     joinClubBtn.addEventListener('click', () => {
       state.save();
       window.location.href = 'lounge.html';
+    });
+  }
+
+  // --- EMAIL AUTH MODAL LOGIC & FORM HANDLERS ---
+  const tabAuthLogin = document.getElementById('tab-auth-login');
+  const tabAuthRegister = document.getElementById('tab-auth-register');
+  const authLoginForm = document.getElementById('auth-login-form');
+  const authRegisterForm = document.getElementById('auth-register-form');
+  const authModalTitle = document.getElementById('auth-modal-title');
+  const authErrorMsg = document.getElementById('auth-error-msg');
+  const profileLogoutBtn = document.getElementById('profile-logout-btn');
+
+  // Tab switching
+  if (tabAuthLogin && tabAuthRegister && authLoginForm && authRegisterForm) {
+    tabAuthLogin.addEventListener('click', () => {
+      tabAuthLogin.classList.add('active');
+      tabAuthLogin.style.backgroundColor = '';
+      tabAuthRegister.classList.remove('active');
+      tabAuthRegister.style.backgroundColor = 'var(--bg-beige-dark)';
+      authLoginForm.style.display = 'block';
+      authRegisterForm.style.display = 'none';
+      if (authModalTitle) authModalTitle.textContent = "Join Pixel Paws";
+      if (authErrorMsg) authErrorMsg.textContent = '';
+    });
+    
+    tabAuthRegister.addEventListener('click', () => {
+      tabAuthRegister.classList.add('active');
+      tabAuthRegister.style.backgroundColor = '';
+      tabAuthLogin.classList.remove('active');
+      tabAuthLogin.style.backgroundColor = 'var(--bg-beige-dark)';
+      authLoginForm.style.display = 'none';
+      authRegisterForm.style.display = 'block';
+      if (authModalTitle) authModalTitle.textContent = "Create Account";
+      if (authErrorMsg) authErrorMsg.textContent = '';
+    });
+  }
+
+  // Auth modal close button
+  if (authModalClose && authModal) {
+    authModalClose.addEventListener('click', () => {
+      authModal.classList.remove('active');
+    });
+  }
+
+  // Close modals when clicking backdrop
+  window.addEventListener('click', (e) => {
+    if (e.target === authModal) {
+      authModal.classList.remove('active');
+    }
+  });
+
+  // Login submit handler
+  if (authLoginForm) {
+    authLoginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      if (authErrorMsg) authErrorMsg.textContent = 'Logging in...';
+      
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        if (authModal) authModal.classList.remove('active');
+      } catch (err) {
+        console.error("Login failed:", err);
+        let readableMsg = "Login failed. Please check your credentials.";
+        if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+          readableMsg = "Incorrect email or password.";
+        } else if (err.code === 'auth/invalid-email') {
+          readableMsg = "Invalid email format.";
+        } else if (err.code === 'auth/operation-not-allowed') {
+          readableMsg = "Login is disabled. Please enable 'Email/Password' in your Firebase console.";
+        }
+        if (authErrorMsg) authErrorMsg.textContent = readableMsg;
+      }
+    });
+  }
+
+  // Register submit handler
+  if (authRegisterForm) {
+    authRegisterForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('register-email').value.trim();
+      const password = document.getElementById('register-password').value;
+      const confirmPassword = document.getElementById('register-confirm-password').value;
+      
+      if (password !== confirmPassword) {
+        if (authErrorMsg) authErrorMsg.textContent = "Passwords do not match.";
+        return;
+      }
+      if (authErrorMsg) authErrorMsg.textContent = 'Registering...';
+      
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        if (authModal) authModal.classList.remove('active');
+      } catch (err) {
+        console.error("Registration failed:", err);
+        let readableMsg = "Registration failed. Try again.";
+        if (err.code === 'auth/email-already-in-use') {
+          readableMsg = "Email is already registered.";
+        } else if (err.code === 'auth/weak-password') {
+          readableMsg = "Password should be at least 6 characters.";
+        } else if (err.code === 'auth/invalid-email') {
+          readableMsg = "Invalid email format.";
+        } else if (err.code === 'auth/operation-not-allowed') {
+          readableMsg = "Registration is disabled. Please enable 'Email/Password' in your Firebase console.";
+        }
+        if (authErrorMsg) authErrorMsg.textContent = readableMsg;
+      }
+    });
+  }
+
+  // Log Out button handler
+  if (profileLogoutBtn) {
+    profileLogoutBtn.addEventListener('click', async () => {
+      try {
+        if (profileModal) profileModal.classList.remove('active');
+        state.resetToDefault(false);
+        await signOut(auth);
+      } catch (err) {
+        console.error("Sign out failed:", err);
+      }
+    });
+  }
+
+  // Log In / Register button handler inside Profile Modal (for Guests)
+  const profileLoginBtn = document.getElementById('profile-login-btn');
+  if (profileLoginBtn) {
+    profileLoginBtn.addEventListener('click', () => {
+      if (profileModal) profileModal.classList.remove('active');
+      if (authModal) {
+        authModal.classList.add('active');
+        // Clear auth fields and error message
+        const loginEmail = document.getElementById('login-email');
+        const loginPass = document.getElementById('login-password');
+        const regEmail = document.getElementById('register-email');
+        const regPass = document.getElementById('register-password');
+        const regConf = document.getElementById('register-confirm-password');
+        const errMsg = document.getElementById('auth-error-msg');
+        
+        if (loginEmail) loginEmail.value = '';
+        if (loginPass) loginPass.value = '';
+        if (regEmail) regEmail.value = '';
+        if (regPass) regPass.value = '';
+        if (regConf) regConf.value = '';
+        if (errMsg) errMsg.textContent = '';
+      }
     });
   }
 
@@ -849,6 +1118,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
     });
+  });
+
+  // Helper to show cloud sync status toasts
+  function showSyncToast(isError, message) {
+    const existing = document.querySelector('.sync-toast');
+    if (existing) existing.remove();
+
+    const toast = document.createElement('div');
+    toast.className = `sync-toast ${isError ? 'error' : 'success'}`;
+    toast.innerHTML = isError 
+      ? `<span>⚠️ Sync Error: ${message}</span>` 
+      : `<span>☁️ Synced with Cloud</span>`;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(10px)';
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  state.on('syncSuccess', (data) => {
+    // Only show sync success toast on foreground saves (profile edit, onboarding finish, login, register)
+    if (data && !data.isBackground) {
+      showSyncToast(false);
+    }
+  });
+
+  state.on('syncError', (err) => {
+    showSyncToast(true, err.message || err);
   });
 
   // Initial welcome message (animated)

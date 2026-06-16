@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Update stats text
     if (pointsText) {
-      pointsText.textContent = `${displayedPoints} / ${maxPoints}`;
+      pointsText.textContent = `${displayedPoints} / ${maxPoints} mins`;
     }
 
     // Update progress bar
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }
     } else {
-      if (statusText) statusText.textContent = 'Quest In Progress...';
+      if (statusText) statusText.textContent = `study in progress... (focus ${displayedPoints}mins/30mins)`;
       if (envelope) {
         envelope.innerHTML = `
           <!-- Closed Envelope SVG -->

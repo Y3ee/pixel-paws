@@ -2102,3 +2102,35 @@ body.dark-mode .mypet-info-card {
     position: static;
   }
 }
+
+/* Sync Status Toast Notification */
+.sync-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--bg-peach-light);
+  border: var(--border-retro-thin);
+  border-radius: var(--border-radius-sm);
+  padding: 8px 16px;
+  box-shadow: var(--shadow-retro);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-header);
+  font-size: 11px;
+  font-weight: bold;
+  opacity: 1;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: translateY(0);
+}
+.sync-toast.error {
+  background-color: #FEE2E2;
+  border-color: #EF4444;
+  color: #B91C1C;
+}
+.sync-toast.success {
+  background-color: #ECFDF5;
+  border-color: #10B981;
+  color: #047857;
+}

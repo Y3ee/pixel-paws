@@ -1,6 +1,6 @@
 /* scripts/firebase.js */
 import { initializeApp } from "firebase/app";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
+import { getAuth, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -26,4 +26,4 @@ try {
   console.error("Firebase failed to initialize. Falling back to LocalStorage.", error);
 }
 
-export { auth, db, isFirebaseEnabled, signInAnonymously, onAuthStateChanged, doc, setDoc, getDoc };
+export { auth, db, isFirebaseEnabled, signInAnonymously, onAuthStateChanged, doc, setDoc, getDoc, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut };

@@ -338,7 +338,7 @@
                 <line x1="8" y1="2" x2="8" y2="6"/>
                 <line x1="3" y1="10" x2="21" y2="10"/>
               </svg>
-              <span id="focus-points-text">30 / 30</span>
+              <span id="focus-points-text">30 / 30 mins</span>
             </span>
           </div>
           
@@ -1070,7 +1070,64 @@
           </div>
         </div>
         <button type="submit" class="onboarding-btn-primary" style="margin-top: 10px; width: 100%;" id="profile-save-btn">Save changes</button>
+        
+        <!-- Account Status & Logout Section -->
+        <div class="form-group" id="profile-email-group" style="margin-top: 15px; border-top: 1px dashed var(--color-brown-light); padding-top: 15px; text-align: center;">
+          <span class="form-label" style="display: block; margin-bottom: 5px;">Account Status</span>
+          <div style="font-size: 11px; color: var(--color-brown-dark); font-weight: bold; margin-bottom: 8px; font-family: inherit;" id="profile-email-text">Logged in as: -</div>
+          <button type="button" class="retro-btn" style="background-color: var(--color-orange); color: white; border-color: var(--color-orange-dark); width: 100%;" id="profile-logout-btn">Log Out</button>
+          <button type="button" class="retro-btn btn-green" style="width: 100%;" id="profile-login-btn">Log In / Register</button>
+        </div>
       </form>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL (LOGIN / REGISTER) -->
+  <div class="modal-backdrop" id="auth-modal">
+    <div class="modal-content" style="max-width: 360px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="auth-modal-title">Join Pixel Paws</h3>
+        <button class="modal-close-btn" id="auth-modal-close">&times;</button>
+      </div>
+      
+      <!-- Auth Tabs -->
+      <div class="auth-tabs" style="display: flex; gap: 4px; margin-bottom: 12px; border-bottom: 2px solid var(--color-brown-light); padding-bottom: 6px;">
+        <button type="button" class="retro-btn auth-tab-btn active" id="tab-auth-login" style="flex: 1; font-size: 11px; padding: 6px 0; font-family: inherit;">Log In</button>
+        <button type="button" class="retro-btn auth-tab-btn" id="tab-auth-register" style="flex: 1; font-size: 11px; padding: 6px 0; background-color: var(--bg-beige-dark); font-family: inherit;">Register</button>
+      </div>
+
+      <!-- Log In Form -->
+      <form class="profile-form" id="auth-login-form" onsubmit="event.preventDefault();">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email Address</label>
+          <input type="email" class="form-input" id="login-email" required placeholder="paws@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="login-password">Password</label>
+          <input type="password" class="form-input" id="login-password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="onboarding-btn-primary" style="margin-top: 10px; width: 100%;" id="auth-login-submit-btn">Log In</button>
+      </form>
+
+      <!-- Register Form -->
+      <form class="profile-form" id="auth-register-form" style="display: none;" onsubmit="event.preventDefault();">
+        <div class="form-group">
+          <label class="form-label" for="register-email">Email Address</label>
+          <input type="email" class="form-input" id="register-email" required placeholder="paws@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="register-password">Password</label>
+          <input type="password" class="form-input" id="register-password" required minlength="6" placeholder="At least 6 characters">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="register-confirm-password">Confirm Password</label>
+          <input type="password" class="form-input" id="register-confirm-password" required minlength="6" placeholder="Repeat password">
+        </div>
+        <button type="submit" class="onboarding-btn-primary" style="margin-top: 10px; width: 100%;" id="auth-register-submit-btn">Register Account</button>
+      </form>
+
+      <!-- Error / Feedback Message -->
+      <div id="auth-error-msg" style="color: var(--color-orange); font-size: 11px; margin-top: 10px; text-align: center; font-weight: bold; min-height: 15px; line-height: 1.3;"></div>
     </div>
   </div>
 
@@ -1089,14 +1146,14 @@
             <h4 class="achievement-name">Morning Brew</h4>
             <p class="achievement-desc">Complete your first Pomodoro session of the day.</p>
           </div>
-          <span class="achievement-date">Locked</span>
+          <span class="achievement-date" id="achieve-morning-date">Locked</span>
         </div>
         <!-- Achievement 2 -->
         <div class="achievement-item">
-          <div class="achievement-icon-box">📖</div>
+          <div class="achievement-icon-box">📚</div>
           <div class="achievement-info">
             <h4 class="achievement-name">Notes Master</h4>
-            <p class="achievement-desc">Complete a 15-minute notes review study goal.</p>
+            <p class="achievement-desc">Create or complete a task on the checklist.</p>
           </div>
           <span class="achievement-date" id="achieve-notes-date">Locked</span>
         </div>
@@ -1105,7 +1162,7 @@
           <div class="achievement-icon-box">🐾</div>
           <div class="achievement-info">
             <h4 class="achievement-name">Lounge Explorer</h4>
-            <p class="achievement-desc">Welcome a study pet companion into the lounge.</p>
+            <p class="achievement-desc">Complete onboarding and visit the Lounge.</p>
           </div>
           <span class="achievement-date" id="achieve-lounge-date">Locked</span>
         </div>
