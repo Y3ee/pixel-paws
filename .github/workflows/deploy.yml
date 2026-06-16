@@ -30,7 +30,7 @@ jobs:
         run: npm ci
 
       - name: Build project
-        run: npx vite build --base=/PixelPaws/
+        run: npx vite build --base=/pixel-paws/
 
       - name: Upload production assets
         uses: actions/upload-pages-artifact@v3
