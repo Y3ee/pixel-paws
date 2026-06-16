@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
-  base: '/PixelPaws/',
+  base: '/pixel-paws/',
   build: {
     rollupOptions: {
       input: {

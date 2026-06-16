@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main  # Change this to master if your main branch is named master
+      - quest
 
 permissions:
   contents: read
